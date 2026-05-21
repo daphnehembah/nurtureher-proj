@@ -142,9 +142,9 @@ const seed = async () => {
   console.log(`Created ${riskFlags.length} risk flag(s)`);
 
   console.log('\nSeed complete. Test accounts:');
-  console.log('  amina@test.com   — pregnant');
-  console.log('  fatima@test.com  — postpartum');
-  console.log('  chioma@test.com  — preconception');
+  console.log(`  amina@test.com   — pregnant     | userId: ${users[0]._id}`);
+  console.log(`  fatima@test.com  — postpartum   | userId: ${users[1]._id}`);
+  console.log(`  chioma@test.com  — preconception| userId: ${users[2]._id}`);
   console.log('  password for all: password123');
 
   mongoose.connection.close();
