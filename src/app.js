@@ -8,6 +8,7 @@ app.use(express.urlencoded({ extended: true }));
 // Routes
 app.use('/api/auth', require('./routes/auth.routes'));
 app.use('/api/users', require('./routes/user.routes'));
+app.use('/api/risk', require('./routes/risk.routes'));
 
 // Health check
 app.get('/', (req, res) => res.json({ status: 'API is running' }));
