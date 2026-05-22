@@ -14,6 +14,7 @@ app.use('/api/symptoms', require('./routes/symptoms.routes'));
 app.use('/api/lifestyle', require('./routes/lifestyle.routes'));
 app.use('/api/risk', require('./routes/risk.routes'));
 app.use('/api/notifications', require('./routes/notifications.routes'));
+app.use('/api/risk', require('./routes/risk.routes'));
 
 // Health check
 app.get('/', (req, res) => res.json({ status: 'API is running' }));
