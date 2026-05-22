@@ -1,18 +1,10 @@
 const router = require('express').Router();
+const { register, login, logout } = require('../controllers/auth.controller');
+const protect = require('../middleware/auth.middleware');
 
-// POST /api/auth/register
-router.post('/register', (req, res) => {
-  res.json({ message: 'Register route — TODO' });
-});
-
-// POST /api/auth/login
-router.post('/login', (req, res) => {
-  res.json({ message: 'Login route — TODO' });
-});
-
-// POST /api/auth/logout
-router.post('/logout', (req, res) => {
-  res.json({ message: 'Logout route — TODO' });
-});
+router.post('/register', register);
+router.post('/login', login);
+router.post('/logout', protect, (req, res) => res.json({ message: 'Logout — TODO' }));
+router.get('/me', protect, (req, res) => res.json({ message: 'Get current user — TODO', user: req.user }));
 
 module.exports = router;

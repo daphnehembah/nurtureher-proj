@@ -8,6 +8,12 @@ app.use(express.urlencoded({ extended: true }));
 // Routes
 app.use('/api/auth', require('./routes/auth.routes'));
 app.use('/api/users', require('./routes/user.routes'));
+app.use('/api/health-profile', require('./routes/healthProfile.routes'));
+app.use('/api/health-status', require('./routes/healthStatus.routes'));
+app.use('/api/symptoms', require('./routes/symptoms.routes'));
+app.use('/api/lifestyle', require('./routes/lifestyle.routes'));
+app.use('/api/risk', require('./routes/risk.routes'));
+app.use('/api/notifications', require('./routes/notifications.routes'));
 
 // Health check
 app.get('/', (req, res) => res.json({ status: 'API is running' }));

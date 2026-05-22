@@ -6,6 +6,16 @@ Auth: Bearer token (JWT) in `Authorization` header
 ---
 
 ## Auth
+Auth (public)
+POST   /api/auth/register
+POST   /api/auth/login
+POST   /api/auth/logout
+
+Users (protected)
+GET    /api/users
+GET    /api/users/:id
+PUT    /api/users/:id
+DELETE /api/users/:id
 
 ### POST /auth/register
 **Body:**

@@ -1,22 +1,19 @@
 const router = require('express').Router();
+const protect = require('../middleware/auth.middleware');
 
-// GET /api/users
-router.get('/', (req, res) => {
-  res.json({ message: 'Get all users — TODO' });
+router.get('/', protect, (req, res) => {
+  res.json({ message: 'Get all users — TODO', requestedBy: req.user });
 });
 
-// GET /api/users/:id
-router.get('/:id', (req, res) => {
+router.get('/:id', protect, (req, res) => {
   res.json({ message: `Get user ${req.params.id} — TODO` });
 });
 
-// PUT /api/users/:id
-router.put('/:id', (req, res) => {
+router.put('/:id', protect, (req, res) => {
   res.json({ message: `Update user ${req.params.id} — TODO` });
 });
 
-// DELETE /api/users/:id
-router.delete('/:id', (req, res) => {
+router.delete('/:id', protect, (req, res) => {
   res.json({ message: `Delete user ${req.params.id} — TODO` });
 });
 
