@@ -2,11 +2,11 @@ const Profile = require('../models/profile');
 
 exports.createProfile = async (req, res) => {
   try {
-    const exists = await Profile.findOne({ user: req.user.id });
+    const exists = await Profile.findOne({ userId: req.user.id });
     if (exists)
       return res.status(409).json({ message: 'Profile already exists. Use PUT to update.' });
 
-    const profile = await Profile.create({ user: req.user.id, ...req.body, profileComplete: true });
+    const profile = await Profile.create({ userId: req.user.id, ...req.body, profileComplete: true });
     res.status(201).json({ message: 'Profile created', profile });
   } catch (err) {
     res.status(500).json({ message: err.message });
@@ -15,7 +15,7 @@ exports.createProfile = async (req, res) => {
 
 exports.getProfile = async (req, res) => {
   try {
-    const profile = await Profile.findOne({ user: req.user.id });
+    const profile = await Profile.findOne({ userId: req.user.id });
     if (!profile)
       return res.status(404).json({ message: 'Profile not found. Please complete onboarding.' });
     res.json({ profile });
@@ -27,7 +27,7 @@ exports.getProfile = async (req, res) => {
 exports.updateProfile = async (req, res) => {
   try {
     const profile = await Profile.findOneAndUpdate(
-      { user: req.user.id },
+      { userId: req.user.id },
       { ...req.body, profileComplete: true },
       { new: true, upsert: true }
     );

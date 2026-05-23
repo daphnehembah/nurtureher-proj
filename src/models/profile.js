@@ -1,29 +1,16 @@
 const mongoose = require('mongoose');
 
 const profileSchema = new mongoose.Schema({
-  user: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true, unique: true },
+  userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true, unique: true },
 
-  // Personal Info
+  // Personal Info (All Stages)
   dateOfBirth: Date,
   phoneNumber: String,
   weight: Number,
   height: Number,
   bloodType: { type: String, enum: ['A+', 'A-', 'B+', 'B-', 'O+', 'O-', 'AB+', 'AB-'] },
 
-  // Pregnancy Details (pregnancy stage only)
-  weeksPregnant: Number,
-  dueDate: Date,
-  previousPregnancies: { type: Number, default: 0 },
-  previousOutcomes: String,
-  complications: String,
-
-  // Health History
-  conditions: [String],
-  medications: String,
-  allergies: String,
-  bloodPressureHistory: String,
-
-  // Lifestyle & Habits
+  // Lifestyle (All Stages)
   smoking: String,
   alcohol: String,
   exercise: String,
@@ -31,10 +18,23 @@ const profileSchema = new mongoose.Schema({
   sleepHours: Number,
   stressLevel: Number,
 
-  // Preconception specific
+  // Pregnancy Only
+  weeksPregnant: Number,
+  dueDate: Date,
+  previousPregnancies: { type: Number, default: 0 },
+  previousOutcomes: String,
+  complications: String,
+  conditions: [String],
+  medications: String,
+  allergies: String,
+  bloodPressureHistory: String,
+
+  // Preconception Only
+  lastPeriodDate: Date,
+  cycleLength: Number,
   cycleRegularity: String,
 
-  // Postpartum specific
+  // Postpartum Only
   deliveryDate: Date,
   deliveryType: String,
   babyBirthWeight: Number,

@@ -2,7 +2,7 @@ const SymptomLog = require('../models/symptomLog');
 
 exports.createLog = async (req, res) => {
   try {
-    const log = await SymptomLog.create({ user: req.user.id, ...req.body });
+    const log = await SymptomLog.create({ userId: req.user.id, ...req.body });
     res.status(201).json({ message: 'Log saved', log });
   } catch (err) {
     res.status(500).json({ message: err.message });
@@ -11,7 +11,7 @@ exports.createLog = async (req, res) => {
 
 exports.getLogs = async (req, res) => {
   try {
-    const logs = await SymptomLog.find({ user: req.user.id }).sort({ date: -1 });
+    const logs = await SymptomLog.find({ userId: req.user.id }).sort({ date: -1 });
     res.json({ logs });
   } catch (err) {
     res.status(500).json({ message: err.message });
@@ -25,7 +25,7 @@ exports.getToday = async (req, res) => {
     const end = new Date();
     end.setHours(23, 59, 59, 999);
 
-    const log = await SymptomLog.findOne({ user: req.user.id, date: { $gte: start, $lte: end } });
+    const log = await SymptomLog.findOne({ userId: req.user.id, date: { $gte: start, $lte: end } });
     res.json({ log: log || null });
   } catch (err) {
     res.status(500).json({ message: err.message });
@@ -42,7 +42,7 @@ exports.getByDate = async (req, res) => {
     const end = new Date(date);
     end.setHours(23, 59, 59, 999);
 
-    const log = await SymptomLog.findOne({ user: req.user.id, date: { $gte: start, $lte: end } });
+    const log = await SymptomLog.findOne({ userId: req.user.id, date: { $gte: start, $lte: end } });
     res.json({ log: log || null });
   } catch (err) {
     res.status(500).json({ message: err.message });
@@ -51,7 +51,7 @@ exports.getByDate = async (req, res) => {
 
 exports.deleteLog = async (req, res) => {
   try {
-    const log = await SymptomLog.findOneAndDelete({ _id: req.params.id, user: req.user.id });
+    const log = await SymptomLog.findOneAndDelete({ _id: req.params.id, userId: req.user.id });
     if (!log) return res.status(404).json({ message: 'Log not found' });
     res.json({ message: 'Log deleted' });
   } catch (err) {

@@ -13,7 +13,7 @@ function getMostCommon(arr, limit) {
 
 exports.getSummary = async (req, res) => {
   try {
-    const logs = await SymptomLog.find({ user: req.user.id }).sort({ date: -1 }).limit(30);
+    const logs = await SymptomLog.find({ userId: req.user.id }).sort({ date: -1 }).limit(30);
     const allSymptoms = logs.flatMap(l => l.symptoms || []);
     const allMoods = logs.map(l => l.mood).filter(Boolean);
 
@@ -30,7 +30,7 @@ exports.getSummary = async (req, res) => {
 
 exports.getSymptomInsights = async (req, res) => {
   try {
-    const logs = await SymptomLog.find({ user: req.user.id });
+    const logs = await SymptomLog.find({ userId: req.user.id });
     const allSymptoms = logs.flatMap(l => l.symptoms || []);
     res.json({ symptoms: getMostCommon(allSymptoms, 10) });
   } catch (err) {
@@ -40,7 +40,7 @@ exports.getSymptomInsights = async (req, res) => {
 
 exports.getMoodInsights = async (req, res) => {
   try {
-    const logs = await SymptomLog.find({ user: req.user.id }).sort({ date: -1 }).limit(30);
+    const logs = await SymptomLog.find({ userId: req.user.id }).sort({ date: -1 }).limit(30);
     const moods = logs.map(l => ({ date: l.date, mood: l.mood })).filter(l => l.mood);
     res.json({ moods });
   } catch (err) {

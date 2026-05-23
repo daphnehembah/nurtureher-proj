@@ -1,9 +1,10 @@
 // Takes a profile document and the user's latest symptom log
-// Returns { riskLevel, riskFactors, recommendations }
+// Returns { riskLevel, score, riskFactors, recommendations, warningSymptoms }
 
 const calculateRisk = (profile, latestSymptomLog) => {
   const riskFactors = [];
   const recommendations = [];
+  const warningSymptoms = [];
   let points = 0;
 
   // ── Age checks (from dateOfBirth) ────────────────────────────
@@ -55,15 +56,15 @@ const calculateRisk = (profile, latestSymptomLog) => {
     points += 1;
   }
 
-  // ── Lifestyle habits (stored as text from onboarding form) ───
+  // ── Lifestyle habits ─────────────────────────────────────────
   if (profile.smoking) {
     const s = profile.smoking.toLowerCase();
     if (['yes', 'daily', 'regularly'].includes(s)) {
       riskFactors.push(`Smoking: ${profile.smoking}`);
       recommendations.push('Stop smoking immediately — seek cessation support');
       points += 3;
-    } else if (s === 'occasionally' || s === 'sometimes') {
-      riskFactors.push(`Occasional smoking reported`);
+    } else if (['occasionally', 'sometimes'].includes(s)) {
+      riskFactors.push('Occasional smoking reported');
       recommendations.push('Avoid all smoking during pregnancy');
       points += 1;
     }
@@ -75,8 +76,8 @@ const calculateRisk = (profile, latestSymptomLog) => {
       riskFactors.push(`Alcohol use: ${profile.alcohol}`);
       recommendations.push('Avoid all alcohol during pregnancy');
       points += 3;
-    } else if (a === 'occasionally' || a === 'sometimes') {
-      riskFactors.push(`Occasional alcohol use reported`);
+    } else if (['occasionally', 'sometimes'].includes(a)) {
+      riskFactors.push('Occasional alcohol use reported');
       points += 1;
     }
   }
@@ -102,7 +103,7 @@ const calculateRisk = (profile, latestSymptomLog) => {
 
     symptoms.forEach((symptom) => {
       if (highRiskSymptoms.some(s => symptom.includes(s))) {
-        riskFactors.push(`High-risk symptom: ${symptom}`);
+        warningSymptoms.push(symptom);
         recommendations.push(`Seek emergency care for: ${symptom}`);
         points += 3;
       } else if (mediumRiskSymptoms.some(s => symptom.includes(s))) {
@@ -116,21 +117,21 @@ const calculateRisk = (profile, latestSymptomLog) => {
   // ── Determine risk level ─────────────────────────────────────
   let riskLevel;
   if (points >= 9) {
-    riskLevel = 'Critical';
+    riskLevel = 'critical';
   } else if (points >= 6) {
-    riskLevel = 'High';
+    riskLevel = 'high';
   } else if (points >= 3) {
-    riskLevel = 'Medium';
+    riskLevel = 'medium';
   } else {
-    riskLevel = 'Low';
+    riskLevel = 'low';
   }
 
-  if (riskLevel === 'Low') {
+  if (riskLevel === 'low') {
     recommendations.push('Continue attending all antenatal appointments');
     recommendations.push('Maintain a healthy diet and stay hydrated');
   }
 
-  return { riskLevel, riskFactors, recommendations };
+  return { riskLevel, score: points, riskFactors, recommendations, warningSymptoms };
 };
 
 module.exports = calculateRisk;

@@ -1,14 +1,16 @@
 const mongoose = require('mongoose');
 
 const riskAssessmentSchema = new mongoose.Schema({
-  user: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
+  userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
   riskLevel: {
     type: String,
-    enum: ['Low', 'Medium', 'High', 'Critical'],
+    enum: ['low', 'medium', 'high', 'critical'],
     required: true
   },
+  score: { type: Number, default: 0 },
   riskFactors: [String],
   recommendations: [String],
+  warningSymptoms: [String],
   assessedAt: { type: Date, default: Date.now }
 });
 
