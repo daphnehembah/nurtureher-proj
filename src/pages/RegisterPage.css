@@ -1,0 +1,316 @@
+.register-page {
+  min-height: 100vh;
+  background: linear-gradient(160deg, #ec407a, #f48fb1, #ce93d8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 16px;
+  font-family: 'DM Sans', sans-serif;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Background SVG */
+.register-bg-svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+/* Content */
+.register-content {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  max-width: 480px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 24px;
+}
+
+/* Brand */
+.register-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: white;
+  font-family: 'DM Serif Display', serif;
+  font-size: 2rem;
+  font-weight: 400;
+  text-shadow: 0 2px 8px rgba(0,0,0,0.15);
+}
+
+.register-brand-icon {
+  font-size: 2.2rem;
+}
+
+/* Tagline */
+.register-tagline {
+  text-align: center;
+}
+
+.register-tagline h2 {
+  font-family: 'DM Serif Display', serif;
+  font-size: 1.6rem;
+  color: white;
+  font-weight: 400;
+  margin-bottom: 6px;
+  text-shadow: 0 1px 6px rgba(0,0,0,0.15);
+}
+
+.register-tagline p {
+  color: rgba(255,255,255,0.85);
+  font-size: 0.88rem;
+  margin-bottom: 14px;
+}
+
+.register-pills {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.register-pills span {
+  background: rgba(255,255,255,0.2);
+  color: white;
+  padding: 5px 14px;
+  border-radius: 999px;
+  font-size: 0.78rem;
+  font-weight: 500;
+  border: 1px solid rgba(255,255,255,0.3);
+  backdrop-filter: blur(4px);
+}
+
+/* Floating card */
+.register-card {
+  width: 100%;
+  background: rgba(255, 245, 248, 0.97);
+  border-radius: 24px;
+  padding: 36px 32px;
+  box-shadow: 0 20px 60px rgba(194, 24, 91, 0.15);
+}
+
+/* Progress bar */
+.register-progress {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 8px;
+}
+
+.register-progress-step {
+  display: flex;
+  align-items: center;
+}
+
+.register-progress-circle {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  border: 2px solid #f8bbd0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: #f8bbd0;
+  background: white;
+  transition: all 0.3s ease;
+}
+
+.register-progress-circle.active {
+  border-color: #ec407a;
+  color: #ec407a;
+}
+
+.register-progress-circle.done {
+  background: #ec407a;
+  border-color: #ec407a;
+  color: white;
+}
+
+.register-progress-line {
+  width: 56px;
+  height: 2px;
+  background: #f8bbd0;
+  transition: background 0.3s ease;
+}
+
+.register-progress-line.active {
+  background: #ec407a;
+}
+
+/* Step labels */
+.register-step-labels {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 24px;
+}
+
+.register-step-labels span {
+  font-size: 0.72rem;
+  color: #ccc;
+  font-weight: 500;
+  flex: 1;
+  text-align: center;
+  transition: color 0.3s;
+}
+
+.register-step-labels span.active {
+  color: #ec407a;
+}
+
+/* Step content */
+.register-step h3 {
+  font-family: 'DM Serif Display', serif;
+  font-size: 1.4rem;
+  color: #c2185b;
+  font-weight: 400;
+  margin-bottom: 4px;
+}
+
+.register-step p {
+  color: #bbb;
+  font-size: 0.85rem;
+  margin-bottom: 20px;
+}
+
+.register-step .form-group {
+  margin-bottom: 14px;
+}
+
+.register-step .form-group label {
+  font-size: 0.75rem;
+  color: #999;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.register-step .form-group input {
+  border: 1.5px solid #f8bbd0;
+  border-radius: 12px;
+  padding: 11px 16px;
+  font-size: 0.9rem;
+  background: white;
+  color: #333;
+  outline: none;
+  width: 100%;
+  font-family: 'DM Sans', sans-serif;
+  transition: border-color 0.2s;
+}
+
+.register-step .form-group input:focus {
+  border-color: #ec407a;
+  box-shadow: 0 0 0 3px rgba(236, 64, 122, 0.08);
+}
+
+/* Buttons */
+.register-btn {
+  width: 100%;
+  padding: 12px;
+  background: linear-gradient(135deg, #ec407a, #f06292);
+  color: white;
+  border: none;
+  border-radius: 12px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.92rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.register-btn:hover {
+  background: linear-gradient(135deg, #d81b60, #ec407a);
+  transform: translateY(-1px);
+  box-shadow: 0 6px 20px rgba(236, 64, 122, 0.25);
+}
+
+.register-btn-row {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.register-btn-row .register-btn {
+  flex: 1;
+}
+
+.register-btn-back {
+  padding: 12px 18px;
+  background: transparent;
+  color: #ec407a;
+  border: 1.5px solid #f8bbd0;
+  border-radius: 12px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.88rem;
+  cursor: pointer;
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+
+.register-btn-back:hover {
+  background: #fff0f5;
+}
+
+/* Stage selector */
+.register-stages {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.register-stage-card {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 16px;
+  border: 1.5px solid #f8bbd0;
+  border-radius: 14px;
+  cursor: pointer;
+  background: white;
+  transition: all 0.2s ease;
+}
+
+.register-stage-card:hover {
+  border-color: #ec407a;
+  background: #fff8fa;
+}
+
+.register-stage-card.active {
+  border-color: #ec407a;
+  background: linear-gradient(135deg, #fff0f5, #fce4ec);
+  box-shadow: 0 4px 14px rgba(236, 64, 122, 0.12);
+}
+
+.register-stage-icon { font-size: 1.6rem; }
+
+.register-stage-title {
+  font-weight: 600;
+  font-size: 0.9rem;
+  color: #333;
+  margin: 0;
+}
+
+.register-stage-desc {
+  font-size: 0.75rem;
+  color: #bbb;
+  margin: 2px 0 0;
+}
+
+/* Bottom link */
+.register-login-link {
+  text-align: center;
+  font-size: 0.85rem;
+  color: rgba(255,255,255,0.85);
+}
+
+.register-login-link a {
+  color: white;
+  font-weight: 600;
+  text-decoration: underline;
+}

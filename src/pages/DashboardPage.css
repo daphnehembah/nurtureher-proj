@@ -1,0 +1,380 @@
+.dashboard-layout {
+  min-height: 100vh;
+  background: #fff9fb;
+  font-family: 'DM Sans', sans-serif;
+}
+
+.dashboard-main {
+  margin-top: 64px;
+  margin-left: 220px;
+  padding: 32px;
+  transition: margin-left 0.3s ease;
+}
+
+/* Banner */
+.dashboard-banner {
+  background: linear-gradient(135deg, #fce4ec, #f8bbd0);
+  border: 1.5px solid #f48fb1;
+  border-radius: 14px;
+  padding: 14px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 24px;
+  font-size: 0.88rem;
+  color: #c2185b;
+}
+
+.dashboard-banner button {
+  background: none;
+  border: none;
+  color: #c2185b;
+  font-weight: 700;
+  cursor: pointer;
+  text-decoration: underline;
+  font-family: 'DM Sans', sans-serif;
+  padding: 0;
+}
+
+.dashboard-banner-close {
+  text-decoration: none !important;
+  font-size: 1rem;
+  opacity: 0.6;
+  margin-left: 16px;
+}
+
+/* Content */
+.dashboard-content {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+/* Calendar */
+.dashboard-calendar {
+  padding: 20px 24px;
+}
+
+.dashboard-calendar-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.dashboard-calendar-month {
+  font-family: 'DM Serif Display', serif;
+  font-size: 1.1rem;
+  color: #c2185b;
+}
+
+.dashboard-calendar-week {
+  font-size: 0.78rem;
+  color: #bbb;
+  font-weight: 500;
+}
+
+.dashboard-calendar-days {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 8px;
+}
+
+.dashboard-cal-day {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 4px;
+  border-radius: 12px;
+  transition: all 0.2s;
+}
+
+.dashboard-cal-name {
+  font-size: 0.72rem;
+  color: #bbb;
+  font-weight: 500;
+  text-transform: uppercase;
+}
+
+.dashboard-cal-num {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #888;
+}
+
+.dashboard-cal-day.today {
+  background: linear-gradient(135deg, #ec407a, #f06292);
+}
+
+.dashboard-cal-day.today .dashboard-cal-name,
+.dashboard-cal-day.today .dashboard-cal-num {
+  color: white;
+}
+
+/* Milestone */
+.dashboard-milestone {
+  background: white;
+  border: 1.5px solid #fce4ec;
+  border-radius: 20px;
+  padding: 28px 32px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 16px;
+  box-shadow: 0 4px 20px rgba(236, 64, 122, 0.06);
+}
+
+.dashboard-milestone-text {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.dashboard-milestone-emoji {
+  font-size: 2.5rem;
+}
+
+.dashboard-milestone h2 {
+  font-family: 'DM Serif Display', serif;
+  font-size: 1.5rem;
+  color: #c2185b;
+  font-weight: 400;
+  margin-bottom: 4px;
+}
+
+.dashboard-milestone p {
+  color: #bbb;
+  font-size: 0.88rem;
+}
+
+.dashboard-insights-link {
+  background: none;
+  border: none;
+  color: #ec407a;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.88rem;
+  font-weight: 600;
+  cursor: pointer;
+  text-decoration: underline;
+  padding: 0;
+}
+
+.dashboard-insights-link:hover {
+  color: #c2185b;
+}
+
+.dashboard-log-btn {
+  padding: 13px 32px;
+  background: linear-gradient(135deg, #ec407a, #f06292);
+  color: white;
+  border: none;
+  border-radius: 999px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.95rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 16px rgba(236, 64, 122, 0.2);
+}
+
+.dashboard-log-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(236, 64, 122, 0.3);
+}
+
+/* Bottom cards */
+.dashboard-cards {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+}
+
+.dashboard-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 10px;
+  padding: 24px 20px;
+  background: #fff9fb;
+  border-color: #fce4ec;
+}
+
+.dashboard-card-label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #bbb;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin: 0;
+}
+
+.dashboard-card h3 {
+  font-family: 'DM Serif Display', serif;
+  font-size: 1.1rem;
+  color: #c2185b;
+  font-weight: 400;
+  margin: 0;
+}
+
+.dashboard-card-sub {
+  font-size: 0.78rem;
+  color: #bbb;
+  margin: 0;
+}
+
+.dashboard-baby-emoji {
+  font-size: 2.8rem;
+}
+
+.dashboard-tip-text {
+  font-size: 0.88rem;
+  color: #888;
+  line-height: 1.6;
+  margin: 0;
+}
+
+.dashboard-risk-card {
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.dashboard-risk-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(236, 64, 122, 0.12);
+}
+
+.dashboard-risk-badge {
+  font-size: 1.2rem;
+  font-weight: 700;
+}
+
+/* Modal */
+.dashboard-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 200;
+  padding: 16px;
+}
+
+.dashboard-modal {
+  background: white;
+  border-radius: 24px;
+  padding: 36px 32px;
+  width: 100%;
+  max-width: 440px;
+  box-shadow: 0 20px 60px rgba(236, 64, 122, 0.15);
+}
+
+.dashboard-modal h3 {
+  font-family: 'DM Serif Display', serif;
+  font-size: 1.4rem;
+  color: #c2185b;
+  font-weight: 400;
+  margin-bottom: 4px;
+}
+
+.dashboard-modal p {
+  color: #bbb;
+  font-size: 0.88rem;
+  margin-bottom: 0;
+}
+
+.dashboard-modal .form-group input,
+.dashboard-modal .form-group select,
+.dashboard-modal .form-group textarea {
+  border: 1.5px solid #f8bbd0;
+  border-radius: 12px;
+  padding: 10px 14px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.9rem;
+  width: 100%;
+  outline: none;
+  background: #fff9fb;
+}
+
+.dashboard-modal .form-group input:focus,
+.dashboard-modal .form-group select:focus,
+.dashboard-modal .form-group textarea:focus {
+  border-color: #ec407a;
+  box-shadow: 0 0 0 3px rgba(236, 64, 122, 0.08);
+}
+
+.dashboard-modal-btns {
+  display: flex;
+  gap: 12px;
+  margin-top: 24px;
+  justify-content: flex-end;
+}
+
+.dashboard-log-submit {
+  padding: 11px 24px;
+  background: linear-gradient(135deg, #ec407a, #f06292);
+  color: white;
+  border: none;
+  border-radius: 12px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.dashboard-log-submit:hover {
+  background: linear-gradient(135deg, #d81b60, #ec407a);
+  transform: translateY(-1px);
+}
+
+/* Responsive */
+@media (max-width: 900px) {
+  .dashboard-main {
+    margin-left: 64px;
+  }
+
+  .dashboard-cards {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 600px) {
+  .dashboard-main {
+    margin-left: 0;
+    padding: 16px;
+  }
+}
+.symptom-pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 4px;
+}
+
+.symptom-pill {
+  padding: 7px 14px;
+  border: 1.5px solid #f8bbd0;
+  border-radius: 999px;
+  background: white;
+  color: #888;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.8rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.symptom-pill:hover {
+  border-color: #ec407a;
+  color: #ec407a;
+  background: #fff0f5;
+}
+
+.symptom-pill.active {
+  background: linear-gradient(135deg, #fce4ec, #f8bbd0);
+  border-color: #ec407a;
+  color: #c2185b;
+  font-weight: 500;
+}
