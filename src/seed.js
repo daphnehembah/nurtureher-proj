@@ -20,9 +20,9 @@ const seed = async () => {
 
   // ── Users ─────────────────────────────────────────────────────
   const users = await User.insertMany([
-    { name: 'Amina Yusuf',   email: 'amina@test.com',  password: 'password123', stage: 'pregnancy' },
-    { name: 'Fatima Bello',  email: 'fatima@test.com', password: 'password123', stage: 'postpartum' },
-    { name: 'Chioma Okafor', email: 'chioma@test.com', password: 'password123', stage: 'preconception' }
+    { name: 'Amina Yusuf',   email: 'amina@dhnm.com',  password: 'password123', stage: 'pregnancy' },
+    { name: 'Fatima Bello',  email: 'fatima@dhnm.com', password: 'password123', stage: 'postpartum' },
+    { name: 'Chioma Okafor', email: 'chioma@dhnm.com', password: 'password123', stage: 'preconception' }
   ]);
   console.log(`Created ${users.length} users`);
 
@@ -105,9 +105,9 @@ const seed = async () => {
   console.log('Created 3 risk assessments');
 
   console.log('\nSeed complete. Test accounts:');
-  console.log(`  amina@test.com   — pregnancy     | userId: ${users[0]._id}`);
-  console.log(`  fatima@test.com  — postpartum    | userId: ${users[1]._id}`);
-  console.log(`  chioma@test.com  — preconception | userId: ${users[2]._id}`);
+  console.log(`  amina@dhnm.com   — pregnancy     | userId: ${users[0]._id}`);
+  console.log(`  fatima@dhnm.com  — postpartum    | userId: ${users[1]._id}`);
+  console.log(`  chioma@dhnm.com  — preconception | userId: ${users[2]._id}`);
   console.log('  password for all: password123');
 
   mongoose.connection.close();
