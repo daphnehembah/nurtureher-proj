@@ -1,128 +1,123 @@
-// Risk scoring logic for NurtureHer
-// Takes a user document and their latest health log
-// Returns { riskLevel: 'Low' | 'Medium' | 'High', triggers: [...] }
+// Takes a profile document and the user's latest symptom log
+// Returns { riskLevel, riskFactors, recommendations }
 
-const calculateRisk = (user, latestHealthLog) => {
-  const triggers = [];
+const calculateRisk = (profile, latestSymptomLog) => {
+  const riskFactors = [];
+  const recommendations = [];
   let points = 0;
 
-  // ── Age checks ──────────────────────────────────────────────
-  if (user.age) {
-    if (user.age < 18) {
-      triggers.push('Age under 18 (teenage pregnancy)');
+  // ── Age checks (from dateOfBirth) ────────────────────────────
+  if (profile.dateOfBirth) {
+    const age = Math.floor((Date.now() - new Date(profile.dateOfBirth)) / (1000 * 60 * 60 * 24 * 365));
+    if (age < 18) {
+      riskFactors.push('Age under 18 (teenage pregnancy)');
+      recommendations.push('Seek specialist care — teenage pregnancies need extra monitoring');
       points += 3;
-    } else if (user.age > 40) {
-      triggers.push('Age over 40 (advanced maternal age)');
+    } else if (age > 40) {
+      riskFactors.push('Age over 40 (advanced maternal age)');
+      recommendations.push('Regular monitoring recommended for advanced maternal age');
       points += 3;
-    } else if (user.age >= 35) {
-      triggers.push('Age 35–40 (elevated maternal age)');
+    } else if (age >= 35) {
+      riskFactors.push('Age 35–40 (elevated maternal age)');
       points += 1;
     }
   }
 
-  // ── Medical history checks ───────────────────────────────────
-  if (user.medicalHistory) {
-    const history = user.medicalHistory.toLowerCase();
+  // ── Medical conditions (array from profile) ──────────────────
+  if (profile.conditions && profile.conditions.length > 0) {
+    const highRisk = ['hypertension', 'diabetes', 'preeclampsia', 'eclampsia', 'gestational diabetes', 'heart disease'];
+    const mediumRisk = ['anaemia', 'anemia', 'thyroid', 'asthma', 'sickle cell'];
 
-    const highRiskConditions = [
-      'hypertension', 'diabetes', 'preeclampsia',
-      'eclampsia', 'gestational diabetes', 'heart disease'
-    ];
-    const mediumRiskConditions = [
-      'anaemia', 'anemia', 'thyroid', 'asthma', 'sickle cell'
-    ];
-
-    highRiskConditions.forEach((condition) => {
-      if (history.includes(condition)) {
-        triggers.push(`High-risk condition in medical history: ${condition}`);
+    profile.conditions.forEach((condition) => {
+      const c = condition.toLowerCase();
+      if (highRisk.some(h => c.includes(h))) {
+        riskFactors.push(`High-risk condition: ${condition}`);
+        recommendations.push(`Seek immediate medical review for ${condition}`);
         points += 3;
-      }
-    });
-
-    mediumRiskConditions.forEach((condition) => {
-      if (history.includes(condition)) {
-        triggers.push(`Medical history includes: ${condition}`);
+      } else if (mediumRisk.some(m => c.includes(m))) {
+        riskFactors.push(`Medical condition: ${condition}`);
         points += 1;
       }
     });
   }
 
   // ── Previous pregnancies ─────────────────────────────────────
-  if (user.previousPregnancies >= 4) {
-    triggers.push('4 or more previous pregnancies');
+  if (profile.previousPregnancies >= 4) {
+    riskFactors.push('4 or more previous pregnancies');
+    recommendations.push('Consult your doctor about grand multiparity risks');
     points += 2;
   }
 
-  // ── Blood group (Rh negative needs monitoring) ───────────────
-  if (user.bloodGroup && user.bloodGroup.includes('-')) {
-    triggers.push(`Rh-negative blood group (${user.bloodGroup}) — requires monitoring`);
+  // ── Blood type (Rh negative) ─────────────────────────────────
+  if (profile.bloodType && profile.bloodType.includes('-')) {
+    riskFactors.push(`Rh-negative blood type (${profile.bloodType})`);
+    recommendations.push('Ensure Rh-D immunoglobulin injections are kept up to date');
     points += 1;
   }
 
-  // ── Lifestyle habit checks (from latest health log) ──────────
-  if (latestHealthLog && latestHealthLog.habits) {
-    const { smoking, alcohol, drugUse, sleep, exercise } = latestHealthLog.habits;
-
-    if (smoking >= 3) {
-      triggers.push(`High smoking habit score (${smoking}/5)`);
+  // ── Lifestyle habits (stored as text from onboarding form) ───
+  if (profile.smoking) {
+    const s = profile.smoking.toLowerCase();
+    if (['yes', 'daily', 'regularly'].includes(s)) {
+      riskFactors.push(`Smoking: ${profile.smoking}`);
+      recommendations.push('Stop smoking immediately — seek cessation support');
       points += 3;
-    } else if (smoking === 2) {
-      triggers.push(`Moderate smoking habit score (${smoking}/5)`);
-      points += 1;
-    }
-
-    if (alcohol >= 3) {
-      triggers.push(`High alcohol intake score (${alcohol}/5)`);
-      points += 3;
-    } else if (alcohol === 2) {
-      triggers.push(`Moderate alcohol intake score (${alcohol}/5)`);
-      points += 1;
-    }
-
-    if (drugUse >= 2) {
-      triggers.push(`Drug use reported (score: ${drugUse}/5)`);
-      points += 3;
-    }
-
-    if (sleep <= 2) {
-      triggers.push(`Poor sleep quality score (${sleep}/5)`);
-      points += 1;
-    }
-
-    if (exercise <= 1) {
-      triggers.push(`Very low exercise score (${exercise}/5)`);
+    } else if (s === 'occasionally' || s === 'sometimes') {
+      riskFactors.push(`Occasional smoking reported`);
+      recommendations.push('Avoid all smoking during pregnancy');
       points += 1;
     }
   }
 
-  // ── Symptom checks ───────────────────────────────────────────
-  if (latestHealthLog && latestHealthLog.symptoms) {
-    const symptoms = latestHealthLog.symptoms.map((s) => s.toLowerCase());
+  if (profile.alcohol) {
+    const a = profile.alcohol.toLowerCase();
+    if (['yes', 'regularly', 'daily'].includes(a)) {
+      riskFactors.push(`Alcohol use: ${profile.alcohol}`);
+      recommendations.push('Avoid all alcohol during pregnancy');
+      points += 3;
+    } else if (a === 'occasionally' || a === 'sometimes') {
+      riskFactors.push(`Occasional alcohol use reported`);
+      points += 1;
+    }
+  }
 
-    const highRiskSymptoms = [
-      'bleeding', 'heavy bleeding', 'chest pain',
-      'difficulty breathing', 'seizure', 'unconscious',
-      'severe headache', 'sudden vision'
-    ];
-    const mediumRiskSymptoms = [
-      'headache', 'swollen feet', 'swelling',
-      'dizziness', 'vomiting', 'fever'
-    ];
+  if (profile.sleepHours && profile.sleepHours < 5) {
+    riskFactors.push(`Very low sleep (${profile.sleepHours} hours/night)`);
+    recommendations.push('Aim for 7–9 hours of sleep per night');
+    points += 1;
+  }
+
+  if (profile.stressLevel && profile.stressLevel >= 4) {
+    riskFactors.push(`High stress level (${profile.stressLevel}/5)`);
+    recommendations.push('Consider stress management or counselling support');
+    points += 1;
+  }
+
+  // ── Symptom checks (from latest symptom log) ─────────────────
+  if (latestSymptomLog && latestSymptomLog.symptoms) {
+    const symptoms = latestSymptomLog.symptoms.map(s => s.toLowerCase());
+
+    const highRiskSymptoms = ['bleeding', 'heavy bleeding', 'chest pain', 'difficulty breathing', 'seizure', 'unconscious', 'severe headache', 'sudden vision'];
+    const mediumRiskSymptoms = ['headache', 'swollen feet', 'swelling', 'dizziness', 'vomiting', 'fever'];
 
     symptoms.forEach((symptom) => {
-      if (highRiskSymptoms.some((s) => symptom.includes(s))) {
-        triggers.push(`High-risk symptom reported: ${symptom}`);
+      if (highRiskSymptoms.some(s => symptom.includes(s))) {
+        riskFactors.push(`High-risk symptom: ${symptom}`);
+        recommendations.push(`Seek emergency care for: ${symptom}`);
         points += 3;
-      } else if (mediumRiskSymptoms.some((s) => symptom.includes(s))) {
-        triggers.push(`Concerning symptom reported: ${symptom}`);
+      } else if (mediumRiskSymptoms.some(s => symptom.includes(s))) {
+        riskFactors.push(`Concerning symptom: ${symptom}`);
+        recommendations.push(`Monitor and report to your doctor: ${symptom}`);
         points += 1;
       }
     });
   }
 
-  // ── Determine risk level from total points ───────────────────
+  // ── Determine risk level ─────────────────────────────────────
   let riskLevel;
-  if (points >= 6) {
+  if (points >= 9) {
+    riskLevel = 'Critical';
+  } else if (points >= 6) {
     riskLevel = 'High';
   } else if (points >= 3) {
     riskLevel = 'Medium';
@@ -130,7 +125,12 @@ const calculateRisk = (user, latestHealthLog) => {
     riskLevel = 'Low';
   }
 
-  return { riskLevel, triggers };
+  if (riskLevel === 'Low') {
+    recommendations.push('Continue attending all antenatal appointments');
+    recommendations.push('Maintain a healthy diet and stay hydrated');
+  }
+
+  return { riskLevel, riskFactors, recommendations };
 };
 
 module.exports = calculateRisk;
