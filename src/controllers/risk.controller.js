@@ -1,56 +1,47 @@
-const User = require('../models/user');
-const HealthLog = require('../models/healthLog');
-const RiskFlag = require('../models/riskFlag');
+const Profile = require('../models/profile');
+const SymptomLog = require('../models/symptomLog');
+const RiskAssessment = require('../models/riskFlag');
 const calculateRisk = require('../utils/riskScoring');
 
-// POST /api/risk/assess/:userId
+// POST /api/risk/assess
 const assessRisk = async (req, res) => {
   try {
-    const { userId } = req.params;
+    const userId = req.user.id;
 
-    const user = await User.findById(userId);
-    if (!user) {
-      return res.status(404).json({ message: 'User not found' });
-    }
+    const profile = await Profile.findOne({ userId });
+    if (!profile)
+      return res.status(404).json({ message: 'Profile not found. Please complete your profile first.' });
 
-    // Get the most recent health log for this user
-    const latestHealthLog = await HealthLog.findOne({ user: userId })
-      .sort({ createdAt: -1 });
+    const latestLog = await SymptomLog.findOne({ userId }).sort({ date: -1 });
 
-    const { riskLevel, triggers } = calculateRisk(user, latestHealthLog);
+    const { riskLevel, score, riskFactors, recommendations, warningSymptoms } = calculateRisk(profile, latestLog);
 
-    // Save the result to RiskFlag collection
-    const riskFlag = await RiskFlag.create({
-      user: userId,
-      riskLevel,
-      triggers
-    });
+    const assessment = await RiskAssessment.create({ userId, riskLevel, score, riskFactors, recommendations, warningSymptoms });
 
-    res.status(201).json({
-      message: 'Risk assessment complete',
-      riskLevel,
-      triggers,
-      riskFlagId: riskFlag._id
-    });
-
+    res.status(201).json({ message: 'Risk assessment complete', riskLevel, score, riskFactors, recommendations, warningSymptoms, assessmentId: assessment._id });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
 };
 
-// GET /api/risk/history/:userId
+// GET /api/risk — latest assessment
+const getLatestRisk = async (req, res) => {
+  try {
+    const assessment = await RiskAssessment.findOne({ userId: req.user.id }).sort({ assessedAt: -1 });
+    res.json({ assessment: assessment || null });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+// GET /api/risk/history
 const getRiskHistory = async (req, res) => {
   try {
-    const { userId } = req.params;
-
-    const history = await RiskFlag.find({ user: userId })
-      .sort({ assessedAt: -1 });
-
+    const history = await RiskAssessment.find({ userId: req.user.id }).sort({ assessedAt: -1 });
     res.json({ history });
-
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
 };
 
-module.exports = { assessRisk, getRiskHistory };
+module.exports = { assessRisk, getLatestRisk, getRiskHistory };
