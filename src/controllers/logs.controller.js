@@ -1,8 +1,26 @@
 const SymptomLog = require('../models/symptomLog');
+const RiskAssessment = require('../models/riskFlag');
+const Profile = require('../models/profile');
+const calculateRisk = require('../utils/riskScoring');
 
 exports.createLog = async (req, res) => {
   try {
     const log = await SymptomLog.create({ userId: req.user.id, ...req.body });
+
+    // Auto recalculate risk after every new log
+    const profile = await Profile.findOne({ userId: req.user.id });
+    if (profile) {
+      const { riskLevel, score, riskFactors, recommendations, warningSymptoms } = calculateRisk(profile, log);
+      await RiskAssessment.create({
+        userId: req.user.id,
+        riskLevel,
+        score,
+        riskFactors,
+        recommendations,
+        warningSymptoms
+      });
+    }
+
     res.status(201).json({ message: 'Log saved', log });
   } catch (err) {
     res.status(500).json({ message: err.message });
