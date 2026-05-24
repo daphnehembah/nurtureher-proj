@@ -93,6 +93,44 @@ const calculateRisk = (profile, latestSymptomLog) => {
     recommendations.push('Consider stress management or counselling support');
     points += 1;
   }
+  
+  // ── Exercise (reduces points for good habits) ─────────────────
+  if (profile.exercise) {
+  const e = profile.exercise.toLowerCase();
+  if (['daily', 'regularly', 'yes'].includes(e)) {
+    points -= 1;
+    recommendations.push('Great — keep up regular exercise');
+  } else if (['never', 'no', 'none'].includes(e)) {
+    riskFactors.push('No exercise reported');
+    recommendations.push('Light exercise like walking is beneficial during pregnancy');
+    points += 1;
+  }}
+  
+  // ── Diet ─────────────────────────────────────────────────────
+  if (profile.diet) {
+  const d = profile.diet.toLowerCase();
+  if (['poor', 'bad', 'unhealthy'].includes(d)) {
+    riskFactors.push('Poor diet reported');
+    recommendations.push('Improve nutrition — consult a dietitian if needed');
+    points += 1;
+  } else if (['good', 'healthy', 'balanced'].includes(d)) {
+    points -= 1;
+  }}
+  
+  // ── Blood pressure history ────────────────────────────────────
+  if (profile.bloodPressureHistory) {
+  const bp = profile.bloodPressureHistory.toLowerCase();
+  if (['high', 'hypertension', 'yes'].includes(bp)) {
+    riskFactors.push('History of high blood pressure');
+    recommendations.push('Monitor blood pressure closely throughout pregnancy');
+    points += 2;
+  }}
+  
+  // ── Previous complications ────────────────────────────────────
+  if (profile.complications) {
+  riskFactors.push(`Previous complications: ${profile.complications}`);
+  recommendations.push('Discuss previous complications with your doctor');
+  points += 2;}
 
   // ── Symptom checks (from latest symptom log) ─────────────────
   if (latestSymptomLog && latestSymptomLog.symptoms) {
@@ -112,6 +150,31 @@ const calculateRisk = (profile, latestSymptomLog) => {
         points += 1;
       }
     });
+
+    // ── Mood from daily log ───────────────────────────────────────
+    if (latestSymptomLog && latestSymptomLog.mood) {
+      const mood = latestSymptomLog.mood.toLowerCase();
+      if (['depressed', 'very sad', 'hopeless'].includes(mood)) {
+        riskFactors.push('Low mood reported in daily log');
+        recommendations.push('Consider speaking to a mental health professional');
+        points += 2;
+      } else if (['anxious', 'stressed', 'sad', 'worried'].includes(mood)) {
+        riskFactors.push('Emotional distress reported in daily log');
+        recommendations.push('Seek emotional support from family or a counsellor');
+        points += 1;
+      } else if (['happy', 'good', 'great', 'calm'].includes(mood)) {
+        points -= 1;
+      }
+    }
+    
+    // ── Period status from daily log ─────────────────────────────
+    if (latestSymptomLog && latestSymptomLog.periodStatus) {
+      if (latestSymptomLog.periodStatus === 'started' || latestSymptomLog.periodStatus === 'ongoing') {
+        riskFactors.push('Active period reported — possible concern during pregnancy');
+        recommendations.push('Report any bleeding to your doctor immediately');
+        points += 2;
+      }
+    }
   }
 
   // ── Determine risk level ─────────────────────────────────────
