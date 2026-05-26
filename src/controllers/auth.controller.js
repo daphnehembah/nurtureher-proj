@@ -9,7 +9,7 @@ const generateToken = (user) => {
   );
 };
 
-exports.register = async (req, res) => {
+exports.register = async (req, res, next) => {
   try {
     const { name, email, password, stage } = req.body;
 
@@ -29,7 +29,7 @@ exports.register = async (req, res) => {
   }
 };
 
-exports.me = async (req, res) => {
+exports.me = async (req, res, next) => {
   try {
     const user = await User.findById(req.user.id).select('-password');
     if (!user) return res.status(404).json({ message: 'User not found' });
@@ -39,7 +39,7 @@ exports.me = async (req, res) => {
   }
 };
 
-exports.login = async (req, res) => {
+exports.login = async (req, res, next) => {
   try {
     const { email, password } = req.body;
 
@@ -61,6 +61,6 @@ exports.login = async (req, res) => {
   }
 };
 
-exports.logout = (req, res) => {
+exports.logout = (req, res, next) => {
   res.status(200).json({ message: 'Logged out successfully' });
 };
