@@ -4,7 +4,7 @@
 **Group:** 29
 **Members:**
 
-- Member A (Backend/API): Daphne Hembah — 20230909
+- Member A (Backend/API): Daphne Hembah — 20231020
 - Member B (Database/Models): Hadiza Na’abba Ghali — 20230829
 - Member C (Frontend/React): Nmesoma Nwosu — 20230909
 - Member D (Testing/Deployment/Docs): Michelle Oko — 20231511
