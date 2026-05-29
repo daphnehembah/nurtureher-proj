@@ -85,3 +85,15 @@
   opacity: 0;
   width: 0;
 }
+
+@media (max-width: 768px) {
+  .sidebar {
+    display: none;
+  }
+
+  .sidebar:not(.collapsed) {
+    display: flex;
+    z-index: 200;
+    box-shadow: 4px 0 20px rgba(236, 64, 122, 0.15);
+  }
+}
