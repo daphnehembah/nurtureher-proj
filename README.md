@@ -9,7 +9,7 @@ NurtureHer is a full-stack web application supporting women across three materna
 
 **Live URLs:**
 
-- Frontend: *(update after deployment)*
+- Frontend: <https://nurtureher-proj.vercel.app/login>
 - Backend API: <https://nurtureher-proj.onrender.com>
 
 ## Features
