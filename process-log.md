@@ -2,7 +2,7 @@
 
 ## Log Entries
 
-### 12th June, 2026 — Project Setup
+### 10th May, 2026 — Project Setup
 
 **What I did:** Read MERN Practical Manual (Ch 9 & 10). Created GitHub, Postman, Render, and Vercel accounts.
 
@@ -12,7 +12,7 @@
 
 **Next Steps:** Submit proposal. Import Postman collection. Await first endpoints from Member A.
 
-### 14th June, 2026 — Documentation
+### 14th May, 2026 — Documentation
 
 **What I did:** Wrote requirements specification document, project proposal, README, process log, and Postman collection for all 17 planned endpoints.
 
@@ -22,7 +22,7 @@
 
 **Next Steps:** Test auth endpoints as soon as Member A completes them.
 
-### 16th June, 2026 — Postman Collection
+### 16th May, 2026 — Postman Collection
 
 **What I did:** Imported NurtureHer-Postman-Collection.json into Postman. Set up environment variables (base_url, token). Verified all 17 endpoint stubs are present across 5 folders.
 
