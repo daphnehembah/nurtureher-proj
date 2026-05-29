@@ -1,0 +1,20 @@
+[33mcommit 4a8c75aaef2edba5cc28917fb623767a570c7ece[m[33m ([m[1;32mfrontend[m[33m)[m
+Author: nmesoma-nwosu <nmesoma.nwosu.20@gmail.com>
+Date:   Fri May 29 16:16:15 2026 -0400
+
+    vercel.json and latest updates
+
+ src/App.jsx                       |   4 [32m+[m
+ src/components/layout/Navbar.css  |   6 [32m+[m
+ src/components/layout/Navbar.jsx  |   2 [32m+[m[31m-[m
+ src/components/layout/Sidebar.jsx |   1 [31m-[m
+ src/pages/CalendarPage.css        | 283 [32m+++++++++++++++++++++++++++++[m
+ src/pages/CalendarPage.jsx        | 369 [32m++++++++++++++++++++++++++++++++++++++[m
+ src/pages/DashboardPage.css       |  12 [32m++[m
+ src/pages/DashboardPage.jsx       |   3 [32m+[m[31m-[m
+ src/pages/InsightsPage.css        |  57 [32m+++++[m[31m-[m
+ src/pages/InsightsPage.jsx        | 246 [32m+++++++++[m[31m----------------[m
+ src/pages/ProfilePage.css         | 169 [32m+++++++++++++++++[m
+ src/pages/ProfilePage.jsx         | 219 [32m++++++++++++++++++++++[m
+ vercel.json                       |   8 [32m+[m
+ 13 files changed, 1208 insertions(+), 171 deletions(-)
