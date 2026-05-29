@@ -13,7 +13,7 @@
 - Member D (Testing/Deployment/Docs): Michelle Oko — 20231511
 
 **Stack:** MongoDB · Express.js · React.js · Node.js
-**Date:** [Insert Date]
+**Date:** 16th May, 2026
 **Version:** 1.0
 
 ## 1. Introduction
