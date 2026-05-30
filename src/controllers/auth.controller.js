@@ -1,3 +1,5 @@
+const Profile = require('../models/profile');
+
 const jwt = require('jsonwebtoken');
 const User = require('../models/user');
 
@@ -21,6 +23,15 @@ exports.register = async (req, res, next) => {
       return res.status(409).json({ message: 'Email already registered' });
 
     const user = await User.create({ name, email, password, stage });
+    // Automatically create empty profile
+await Profile.create({
+  userId: user._id,
+  stage: stage,
+  profileComplete: false
+});
+
+const token = generateToken(user);
+res.status(201).json({ token, user: { id: user._id, name: user.name, email: user.email, stage: user.stage } });
 
     const token = generateToken(user);
     res.status(201).json({ token, user: { id: user._id, name: user.name, email: user.email, stage: user.stage } });

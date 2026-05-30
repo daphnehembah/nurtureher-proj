@@ -15,9 +15,16 @@ exports.createProfile = async (req, res) => {
 
 exports.getProfile = async (req, res) => {
   try {
-    const profile = await Profile.findOne({ userId: req.user.id });
-    if (!profile)
-      return res.status(404).json({ message: 'Profile not found. Please complete onboarding.' });
+    let profile = await Profile.findOne({ userId: req.user.id });
+
+    if (!profile) {
+      profile = {
+        userId: req.user.id,
+        stage: null,
+        profileComplete: false
+      };
+    }
+
     res.json({ profile });
   } catch (err) {
     res.status(500).json({ message: err.message });
