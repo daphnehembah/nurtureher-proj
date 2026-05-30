@@ -1,4 +1,3 @@
-import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import Navbar from '../components/layout/Navbar'
 import Sidebar from '../components/layout/Sidebar'
@@ -7,6 +6,8 @@ import {
   tipsOfTheDay, preconceptionTips, postpartumTips,
   trimesterInfo, getBabySize, getFertileWindow, getBabyAge
 } from '../data/mockData'
+import api from '../services/api'
+import { useState, useEffect } from 'react'
 import './DashboardPage.css'
 
 // ── Symptom lists by stage ──────────────────────────────
@@ -58,6 +59,22 @@ export default function DashboardPage() {
   // ── Stage & user data ──
   const stage = localStorage.getItem('nurture_stage') || 'pregnancy'
   const name  = localStorage.getItem('nurture_name')  || 'there'
+  const [profile, setProfile] = useState(null)
+
+  useEffect(() => {
+    const fetchProfile = async () => {
+      try {
+        const response = await api.get('/profile')
+        setProfile(response.data.profile)
+        if (response.data.profile?.stage) {
+          localStorage.setItem('nurture_stage', response.data.profile.stage)
+        }
+      } catch (err) {
+        console.log('Using mock data:', err)
+      }
+    }
+    fetchProfile()
+  }, [])
 
   const activeUser = stage === 'preconception'
     ? mockPreconceptionUser
@@ -105,10 +122,20 @@ export default function DashboardPage() {
     })
   }
 
-  const handleLogSubmit = () => {
-    // Will connect to real API in Week 2-3
-    console.log('Log saved:', { mood, symptoms, notes, periodStatus })
-    alert(`Logged! Mood: ${mood}, Symptoms: ${symptoms.join(', ')}`)
+  const handleLogSubmit = async () => {
+    try {
+      await api.post('/logs', {
+        date: new Date().toISOString().split('T')[0],
+        mood,
+        symptoms,
+        notes,
+        periodStatus
+      })
+      alert('Log saved successfully! 🌸')
+    } catch (err) {
+      console.log('Log save failed:', err)
+      alert('Failed to save log. Please try again.')
+    }
     setShowLogModal(false)
     setMood('')
     setSymptoms([])

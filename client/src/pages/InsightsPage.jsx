@@ -6,24 +6,49 @@ import {
   trimesterInfo, getBabySize, getFertileWindow, getBabyAge,
   getClosestWeekInsight, preconceptionInsights, postpartumInsights
 } from '../data/mockData'
+import {  useEffect } from 'react'
+import api from '../services/api'
 import './InsightsPage.css'
 
+
 export default function InsightsPage() {
-  const stage     = localStorage.getItem('nurture_stage') || 'pregnancy'
   const [activeTab, setActiveTab] = useState(0)
+  const [profile,   setProfile]   = useState(null)
+
+  useEffect(() => {
+    const fetchProfile = async () => {
+      try {
+        const response = await api.get('/profile')
+        setProfile(response.data.profile)
+      } catch (err) {
+        console.log('Using mock data:', err)
+      }
+    }
+    fetchProfile()
+  }, [])
+
+  
+  
+
+  const stage = profile?.stage || localStorage.getItem('nurture_stage') || 'pregnancy'
+  const weeksPregnant = profile?.weeksPregnant || weeksPregnant
+  const dueDate = profile?.dueDate || dueDate
+  const lastPeriodDate = profile?.lastPeriodDate || lastPeriodDate
+  const cycleLength = profile?.cycleLength || cycleLength
+  const deliveryDate = profile?.deliveryDate || deliveryDate
 
   // Pregnancy data
-  const milestone = stage === 'pregnancy' ? trimesterInfo(mockUser.weeksPregnant)             : null
-  const baby      = stage === 'pregnancy' ? getBabySize(mockUser.weeksPregnant)               : null
-  const insight   = stage === 'pregnancy' ? getClosestWeekInsight(mockUser.weeksPregnant)     : null
+  const milestone = stage === 'pregnancy' ? trimesterInfo(weeksPregnant)             : null
+  const baby      = stage === 'pregnancy' ? getBabySize(weeksPregnant)               : null
+  const insight   = stage === 'pregnancy' ? getClosestWeekInsight(weeksPregnant)     : null
 
   // Preconception data
   const fertile   = stage === 'preconception'
-    ? getFertileWindow(mockPreconceptionUser.lastPeriodDate, mockPreconceptionUser.cycleLength)
+    ? getFertileWindow(lastPeriodDate, cycleLength)
     : null
 
   // Postpartum data
-  const babyAge   = stage === 'postpartum' ? getBabyAge(mockPostpartumUser.deliveryDate) : null
+  const babyAge   = stage === 'postpartum' ? getBabyAge(deliveryDate) : null
 
   // ── Tabs per stage ──
   const pregnancyTabs = [

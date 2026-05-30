@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
+import api from '../services/api'
 import './LoginPage.css'
 
 const slides = [
@@ -38,14 +39,15 @@ export default function LoginPage() {
     e.preventDefault()
     setError('')
     setLoading(true)
-    if (email && password) {
-      login({ name: 'User', email }, 'mock-jwt-token')
+    try {
+      const response = await api.post('/auth/login', { email, password })
+      login(response.data.user, response.data.token)
       navigate('/dashboard')
-    } else {
-      setError('Please enter your email and password.')
+    } catch (err) {
+      setError(err.response?.data?.message || 'Invalid email or password.')
     }
     setLoading(false)
-  }
+}
 
   return (
     <div className="login-page">

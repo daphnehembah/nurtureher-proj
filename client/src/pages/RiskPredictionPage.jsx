@@ -1,8 +1,9 @@
-import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import Navbar from '../components/layout/Navbar'
 import Sidebar from '../components/layout/Sidebar'
 import { mockRiskData } from '../data/mockData'
+import { useState, useEffect } from 'react'
+import api from '../services/api'
 import './RiskPredictionPage.css'
 
 const riskConfig = {
@@ -49,9 +50,38 @@ const historyColors = {
 
 export default function RiskPredictionPage() {
   const navigate = useNavigate()
-  const risk     = riskConfig[mockRiskData.riskLevel]
-  const [activeTab, setActiveTab] = useState('factors')
+  const [activeTab, setActiveTab]   = useState('factors')
+  const [riskData,  setRiskData]    = useState(mockRiskData)
+  const [loading,   setLoading]     = useState(true)
 
+  useEffect(() => {
+    const fetchRisk = async () => {
+      try {
+        const response = await api.get('/risk')
+        setRiskData(response.data)
+      } catch (err) {
+        console.log('Using mock risk data:', err)
+      } finally {
+        setLoading(false)
+      }
+    }
+    fetchRisk()
+  }, [])
+
+  const risk = riskConfig[riskData.riskLevel]
+   
+  if (loading) return (
+    <div className="dashboard-layout">
+      <Navbar />
+      <Sidebar />
+      <main className="dashboard-main">
+        <p style={{ color: '#ec407a', fontFamily: 'DM Sans, sans-serif' }}>
+          Loading your risk assessment... 🌸
+        </p>
+      </main>
+    </div>
+  )
+ 
   return (
     <div className="dashboard-layout">
       <Navbar />
@@ -84,9 +114,19 @@ export default function RiskPredictionPage() {
             </p>
             <button
               className="risk-reassess-btn"
-              onClick={() => navigate('/onboarding')}
+              onClick={async () => {
+                try {
+                  setLoading(true)
+                  const response = await api.post('/risk/assess')
+                  setRiskData(response.data)
+                } catch (err) {
+                  console.log('Reassess failed:', err)
+                } finally {
+                  setLoading(false)
+                }
+              }}
             >
-              🔄 Update Profile to Reassess
+              🔄 Reassess My Risk
             </button>
           </div>
 

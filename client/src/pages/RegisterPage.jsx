@@ -2,7 +2,8 @@ import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import './RegisterPage.css'
-import { use } from 'react'
+import api from '../services/api'
+
 
 const stages = [
   { id: 'preconception', icon: '🌸', title: 'Preconception', desc: 'Planning and preparing for pregnancy' },
@@ -34,14 +35,23 @@ export default function RegisterPage() {
     setStep(prev => prev + 1)
   }
 
-  const handleSubmit = () => {
-  if (!form.stage) return setError('Please choose your journey stage.')
-  // Save stage temporarily until real API is ready
-  localStorage.setItem('nurture_stage', form.stage)
-  localStorage.setItem('nurture_name', form.name)
-  login({ name: form.name, email: form.email }, 'mock-jwt-token')
-  navigate('/onboarding')
-  }
+  const handleSubmit = async () => {
+    if (!form.stage) return setError('Please choose your journey stage.')
+    try {
+      const response = await api.post('/auth/register', {
+        name: form.name,
+        email: form.email,
+        password: form.password,
+        stage: form.stage
+      })
+      localStorage.setItem('nurture_stage', form.stage)
+      localStorage.setItem('nurture_name', form.name)
+      login(response.data.user, response.data.token)
+      navigate('/onboarding')
+    } catch (err) {
+      setError(err.response?.data?.message || 'Registration failed. Please try again.')
+    }
+}
 
   return (
     <div className="register-page">

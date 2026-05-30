@@ -1,6 +1,7 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Navbar from '../components/layout/Navbar'
 import Sidebar from '../components/layout/Sidebar'
+import api from '../services/api'
 import { mockPreconceptionUser, mockPostpartumUser, mockUser, getFertileWindow, getBabyAge } from '../data/mockData'
 import './CalendarPage.css'
 
@@ -44,6 +45,24 @@ export default function CalendarPage() {
   const [logSymptoms,  setLogSymptoms]  = useState([])
   const [logNotes,     setLogNotes]     = useState('')
   const [logs,         setLogs]         = useState(mockLogs)
+
+
+  useEffect(() => {
+    const fetchLogs = async () => {
+      try {
+        const response = await api.get('/logs')
+        // Convert array to object keyed by date
+        const logsObj = {}
+        response.data.logs.forEach(log => {
+          logsObj[log.date] = log
+        })
+        setLogs(logsObj)
+      } catch (err) {
+        console.log('Using mock logs:', err)
+      }
+    }
+    fetchLogs()
+  }, [])
 
   // Fertile window dates
   const getFertileDates = () => {
@@ -99,11 +118,22 @@ export default function CalendarPage() {
     setShowEditModal(true)
   }
 
-  const handleSaveLog = () => {
-    setLogs(prev => ({
-      ...prev,
-      [selectedDate]: { mood: logMood, symptoms: logSymptoms, notes: logNotes }
-    }))
+  const handleSaveLog = async () => {
+    try {
+      await api.post('/logs', {
+        date: selectedDate,
+        mood: logMood,
+        symptoms: logSymptoms,
+        notes: logNotes,
+        periodStatus: logSymptoms.find(s => s.includes('🔴') || s === 'Ongoing' || s === 'Just ended' || s === 'Not on period') || ''
+      })
+      setLogs(prev => ({
+        ...prev,
+        [selectedDate]: { mood: logMood, symptoms: logSymptoms, notes: logNotes }
+      }))
+    } catch (err) {
+      console.log('Log save failed:', err)
+    }
     setShowEditModal(false)
     setShowViewModal(true)
   }

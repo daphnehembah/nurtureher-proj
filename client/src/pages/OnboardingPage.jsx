@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import api from '../services/api'
 import './OnboardingPage.css'
 
 // ── Field configs per stage ──────────────────────────────
@@ -143,22 +144,30 @@ export default function OnboardingPage() {
     update(id, updated)
   }
 
-  const nextStep = () => {
+  const nextStep = async () => {
     setError('')
     if (isLast) {
-      localStorage.setItem('nurture_profile', JSON.stringify(form))
-      localStorage.setItem('nurture_profile_complete', 'true')
-      navigate('/dashboard')
+      try {
+        await api.post('/profile', form)
+        localStorage.setItem('nurture_profile_complete', 'true')
+        navigate('/dashboard')
+      } catch (err) {
+        setError(err.response?.data?.message || 'Failed to save profile. Please try again.')
+      }
     } else {
       setStep(prev => prev + 1)
     }
   }
-
-  const skipAll = () => {
+  const skipAll = async () => {
+    try {
+      await api.post('/profile', { ...form, profileComplete: false })
+    } catch  {
+      console.log('Profile save skipped')
+    }
     localStorage.setItem('nurture_profile_complete', 'false')
     navigate('/dashboard')
   }
-
+  
   return (
     <div className="onboarding-page">
       <div className="onboarding-container">

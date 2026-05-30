@@ -2,7 +2,9 @@ import { useNavigate } from 'react-router-dom'
 import Navbar from '../components/layout/Navbar'
 import Sidebar from '../components/layout/Sidebar'
 import { useAuth } from '../context/AuthContext'
-import { mockUser, mockPreconceptionUser, mockPostpartumUser, trimesterInfo, getBabyAge } from '../data/mockData'
+import { useState, useEffect } from 'react'
+import api from '../services/api'
+import { mockUser, mockPostpartumUser, trimesterInfo, getBabyAge } from '../data/mockData'
 import './ProfilePage.css'
 
 export default function ProfilePage() {
@@ -11,11 +13,7 @@ export default function ProfilePage() {
   const stage = localStorage.getItem('nurture_stage') || 'pregnancy'
   const name  = localStorage.getItem('nurture_name') || user?.name || 'User'
 
-  const activeUser = stage === 'pregnancy'
-    ? mockUser
-    : stage === 'preconception'
-    ? mockPreconceptionUser
-    : mockPostpartumUser
+  
 
   const milestone = stage === 'pregnancy' ? trimesterInfo(mockUser.weeksPregnant) : null
   const babyAge   = stage === 'postpartum' ? getBabyAge(mockPostpartumUser.deliveryDate) : null
@@ -31,30 +29,56 @@ export default function ProfilePage() {
     navigate('/login')
   }
 
-  // Mock profile data — will come from API in Week 2-3
-  const profile = {
-    dob:             '1995-03-12',
-    phone:           '+234 800 000 0000',
-    weight:          '65kg',
-    height:          '162cm',
-    bloodType:       'O+',
-    weeksPregnant:   20,
-    dueDate:         '2026-10-15',
-    prevPregnancies: 1,
-    prevOutcomes:    'All healthy births',
-    conditions:      ['None'],
-    medications:     'Prenatal vitamins',
-    allergies:       'None',
-    smoking:         'No',
-    alcohol:         'No',
-    exercise:        '3–4 times/week',
-    
-    sleep:           '7',
-    stress:          'Moderate',
-  }
+  const [profile, setProfile] = useState({
+    dob:             '',
+    phone:           '',
+    weight:          '',
+    height:          '',
+    bloodType:       '',
+    weeksPregnant:   '',
+    dueDate:         '',
+    prevPregnancies: '',
+    prevOutcomes:    '',
+    conditions:      [],
+    medications:     '',
+    allergies:       '',
+    smoking:         '',
+    alcohol:         '',
+    exercise:        '',
+    diet:            '',
+    sleep:           '',
+    stress:          '',
+  })
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    const fetchProfile = async () => {
+      try {
+        const response = await api.get('/profile')
+        setProfile(response.data.profile)
+      } catch (err) {
+        console.log('Using mock profile:', err)
+      } finally {
+        setLoading(false)
+      }
+    }
+    fetchProfile()
+  }, [])
+ 
 
   const initials = name.split(' ').map(n => n[0]).join('').toUpperCase()
-
+  
+  if (loading) return (
+    <div className="dashboard-layout">
+      <Navbar />
+      <Sidebar />
+      <main className="dashboard-main">
+        <p style={{ color: '#ec407a', fontFamily: 'DM Sans, sans-serif' }}>
+          Loading your profile... 🌸
+        </p>
+      </main>
+    </div>
+  )
   return (
     <div className="dashboard-layout">
       <Navbar />
