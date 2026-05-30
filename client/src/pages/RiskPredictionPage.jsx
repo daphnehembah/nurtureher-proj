@@ -4,6 +4,7 @@ import Sidebar from '../components/layout/Sidebar'
 import { mockRiskData } from '../data/mockData'
 import { useState, useEffect } from 'react'
 import api from '../services/api'
+import ProfileBanner from '../components/ui/ProfileBanner'
 import './RiskPredictionPage.css'
 
 const riskConfig = {
@@ -13,7 +14,11 @@ const riskConfig = {
     ring: '#22c55e',
     label: 'LOW RISK',
     emoji: '🟢',
-    message: 'Your pregnancy is progressing well. Keep up the great work!'
+    message: {
+      pregnancy:     'Your pregnancy is progressing well. Keep up the great work!',
+      preconception: 'Your preconception health looks good. Keep up the great work!',
+      postpartum:    'Your postpartum recovery is going well. Keep up the great work!'
+    }
   },
   medium: {
     color: '#b45309',
@@ -21,7 +26,11 @@ const riskConfig = {
     ring: '#f59e0b',
     label: 'MEDIUM RISK',
     emoji: '🟡',
-    message: 'Some risk factors have been detected. Please follow the recommendations below.'
+    message: {
+      pregnancy:     'Some risk factors detected. Please follow the recommendations below.',
+      preconception: 'Some risk factors detected. Please follow the recommendations below.',
+      postpartum:    'Some risk factors detected. Please follow the recommendations below.'
+    }
   },
   high: {
     color: '#b91c1c',
@@ -29,7 +38,11 @@ const riskConfig = {
     ring: '#ef4444',
     label: 'HIGH RISK',
     emoji: '🔴',
-    message: 'Multiple risk factors detected. Please contact your doctor as soon as possible.'
+    message: {
+      pregnancy:     'Multiple risk factors detected. Please contact your doctor as soon as possible.',
+      preconception: 'Multiple risk factors detected. Please contact your doctor as soon as possible.',
+      postpartum:    'Multiple risk factors detected. Please contact your doctor as soon as possible.'
+    }
   },
   critical: {
     color: '#7f1d1d',
@@ -37,7 +50,11 @@ const riskConfig = {
     ring: '#7f1d1d',
     label: 'CRITICAL RISK',
     emoji: '🚨',
-    message: 'Critical risk detected. Please seek immediate medical attention.'
+    message: {
+      pregnancy:     'Critical risk detected. Please seek immediate medical attention.',
+      preconception: 'Critical risk detected. Please seek immediate medical attention.',
+      postpartum:    'Critical risk detected. Please seek immediate medical attention.'
+    }
   }
 }
 
@@ -68,8 +85,9 @@ export default function RiskPredictionPage() {
     fetchRisk()
   }, [])
 
-  const risk = riskConfig[riskData.riskLevel]
-   
+  const risk = riskConfig[riskData?.riskLevel] || riskConfig['low']
+  const stage = localStorage.getItem('nurture_stage') || 'pregnancy' 
+
   if (loading) return (
     <div className="dashboard-layout">
       <Navbar />
@@ -81,7 +99,16 @@ export default function RiskPredictionPage() {
       </main>
     </div>
   )
- 
+  if (!riskData?.riskLevel) return (
+    <div className="dashboard-layout">
+      <Navbar />
+      <Sidebar />
+      <main className="dashboard-main" style={{ padding: '32px' }}>
+        <ProfileBanner />
+      </main>
+    </div>
+  )
+  
   return (
     <div className="dashboard-layout">
       <Navbar />
@@ -109,9 +136,9 @@ export default function RiskPredictionPage() {
                 Score: {riskData.score}/10
               </span>
             </div>
-            <p className="risk-circle-message" style={{ color: risk.color }}>
-              {risk.message}
-            </p>
+           <p className="risk-circle-message" style={{ color: risk.color }}>
+             {risk.message[stage]}
+           </p>
             <button
               className="risk-reassess-btn"
               onClick={async () => {
@@ -158,7 +185,7 @@ export default function RiskPredictionPage() {
                 <h3>Why this risk level?</h3>
                 <p>These factors from your profile and recent logs contributed to your score:</p>
                 <ul>
-                  {riskData.riskFactors.map((factor, i) => (
+                  {(riskData.riskFactors || []).map((factor, i) => (
                     <li key={i} className="risk-list-item risk-list-item--danger">
                       <span className="risk-list-icon">⚠️</span>
                       <span>{factor}</span>
@@ -174,7 +201,7 @@ export default function RiskPredictionPage() {
                 <h3>What you should do</h3>
                 <p>Follow these recommendations to manage your risk level:</p>
                 <ul>
-                  {riskData.recommendations.map((rec, i) => (
+                  {(riskData.recommendations || []).map((rec, i) => (
                     <li key={i} className="risk-list-item risk-list-item--success">
                       <span className="risk-list-icon">✅</span>
                       <span>{rec}</span>
@@ -190,7 +217,7 @@ export default function RiskPredictionPage() {
                 <h3>Symptoms to watch out for</h3>
                 <p>Seek immediate medical attention if you experience any of these:</p>
                 <ul>
-                  {riskData.warningSymptoms.map((symptom, i) => (
+                  {(riskData.warningSymptoms || []).map((symptom, i) => (
                     <li key={i} className="risk-list-item risk-list-item--warning">
                       <span className="risk-list-icon">🔴</span>
                       <span>{symptom}</span>
@@ -206,7 +233,7 @@ export default function RiskPredictionPage() {
                 <h3>Risk Level History</h3>
                 <p>How your risk level has changed over time:</p>
                 <div className="risk-history">
-                  {riskData.history.map((entry, i) => {
+                  {(riskData.history || []).map((entry, i) => {
                     const isLast = i === riskData.history.length - 1
                     const config = historyColors[entry.level]
                     return (

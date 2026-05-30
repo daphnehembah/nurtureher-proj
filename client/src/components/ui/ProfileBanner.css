@@ -1,0 +1,69 @@
+.profile-banner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  background: linear-gradient(135deg, #fce4ec, #f8bbd0);
+  border: 1.5px solid #f48fb1;
+  border-radius: 16px;
+  padding: 16px 20px;
+  margin-bottom: 8px;
+  font-family: 'DM Sans', sans-serif;
+  flex-wrap: wrap;
+}
+
+.profile-banner-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.profile-banner-icon {
+  font-size: 1.8rem;
+  flex-shrink: 0;
+}
+
+.profile-banner-title {
+  font-size: 0.92rem;
+  font-weight: 600;
+  color: #c2185b;
+  margin: 0 0 2px;
+}
+
+.profile-banner-sub {
+  font-size: 0.78rem;
+  color: #e91e8c;
+  margin: 0;
+  opacity: 0.8;
+}
+
+.profile-banner-btn {
+  padding: 9px 20px;
+  background: linear-gradient(135deg, #ec407a, #f06292);
+  color: white;
+  border: none;
+  border-radius: 999px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.85rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+
+.profile-banner-btn:hover {
+  background: linear-gradient(135deg, #d81b60, #ec407a);
+  transform: translateY(-1px);
+}
+
+@media (max-width: 600px) {
+  .profile-banner {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .profile-banner-btn {
+    width: 100%;
+    text-align: center;
+  }
+}

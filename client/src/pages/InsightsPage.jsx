@@ -1,21 +1,20 @@
 import { useState, useEffect } from 'react'
 import Navbar from '../components/layout/Navbar'
 import Sidebar from '../components/layout/Sidebar'
+import ProfileBanner from '../components/ui/ProfileBanner'
 import {
-  mockUser, mockPreconceptionUser, mockPostpartumUser,
   trimesterInfo, getBabySize, getFertileWindow, getBabyAge,
   getClosestWeekInsight, preconceptionInsights, postpartumInsights
 } from '../data/mockData'
 import api from '../services/api'
 import './InsightsPage.css'
 
-
 export default function InsightsPage() {
   const [activeTab, setActiveTab] = useState(0)
-  const [profile, setProfile] = useState(null)
-  const [loading, setLoading] = useState(true)
-  const [error,   setError]   = useState(false)
-  
+  const [profile,   setProfile]   = useState(null)
+  const [loading,   setLoading]   = useState(true)
+  const [error,     setError]     = useState(false)
+
   useEffect(() => {
     const fetchProfile = async () => {
       try {
@@ -31,44 +30,35 @@ export default function InsightsPage() {
     fetchProfile()
   }, [])
 
-  
-  
+  const stage          = profile?.stage          || localStorage.getItem('nurture_stage') || 'pregnancy'
+  const weeksPregnant  = profile?.weeksPregnant  || null
+  const lastPeriodDate = profile?.lastPeriodDate || null
+  const cycleLength    = profile?.cycleLength    || null
+  const deliveryDate   = profile?.deliveryDate   || null
 
-  const stage          = profile?.stage
-  const weeksPregnant  = profile?.weeksPregnant
-  const lastPeriodDate = profile?.lastPeriodDate
-  const cycleLength    = profile?.cycleLength
-  const deliveryDate   = profile?.deliveryDate
-  // Pregnancy data
-  const milestone = stage === 'pregnancy' ? trimesterInfo(weeksPregnant)             : null
-  const baby      = stage === 'pregnancy' ? getBabySize(weeksPregnant)               : null
-  const insight   = stage === 'pregnancy' ? getClosestWeekInsight(weeksPregnant)     : null
+  // Only calculate if real data exists
+  const milestone = stage === 'pregnancy' && weeksPregnant ? trimesterInfo(weeksPregnant)         : null
+  const baby      = stage === 'pregnancy' && weeksPregnant ? getBabySize(weeksPregnant)           : null
+  const insight   = stage === 'pregnancy' && weeksPregnant ? getClosestWeekInsight(weeksPregnant) : null
+  const fertile   = stage === 'preconception' && lastPeriodDate ? getFertileWindow(lastPeriodDate, cycleLength) : null
+  const babyAge   = stage === 'postpartum' && deliveryDate ? getBabyAge(deliveryDate) : null
 
-  // Preconception data
-  const fertile   = stage === 'preconception'
-    ? getFertileWindow(lastPeriodDate, cycleLength)
-    : null
-
-  // Postpartum data
-  const babyAge   = stage === 'postpartum' ? getBabyAge(deliveryDate) : null
-
-  // ── Tabs per stage ──
   const pregnancyTabs = [
-    { icon: '🌸', label: 'Your Body',  facts: insight?.body },
-    { icon: '👶', label: 'Your Baby',  facts: insight?.baby },
-    { icon: '💡', label: 'Tips',       facts: insight?.tips },
+    { icon: '🌸', label: 'Your Body', facts: insight?.body },
+    { icon: '👶', label: 'Your Baby', facts: insight?.baby },
+    { icon: '💡', label: 'Tips',      facts: insight?.tips },
   ]
 
   const preconceptionTabs = [
-    { icon: '🌸', label: 'Your Body',     facts: preconceptionInsights.body },
+    { icon: '🌸', label: 'Your Body',      facts: preconceptionInsights.body },
     { icon: '🌡️', label: 'Your Fertility', facts: preconceptionInsights.fertility },
     { icon: '💡', label: 'Tips',           facts: preconceptionInsights.tips },
   ]
 
   const postpartumTabs = [
-    { icon: '🌸', label: 'Your Body',   facts: postpartumInsights.body },
-    { icon: '💜', label: 'Recovery',    facts: postpartumInsights.recovery },
-    { icon: '💡', label: 'Tips',        facts: postpartumInsights.tips },
+    { icon: '🌸', label: 'Your Body', facts: postpartumInsights.body },
+    { icon: '💜', label: 'Recovery',  facts: postpartumInsights.recovery },
+    { icon: '💡', label: 'Tips',      facts: postpartumInsights.tips },
   ]
 
   const tabs = stage === 'pregnancy'
@@ -119,31 +109,43 @@ export default function InsightsPage() {
       <main className="dashboard-main">
         <div className="insights-content">
 
-          {/* ── Header ── */}
+          {/* Profile incomplete banner */}
+          {!profile?.weeksPregnant && stage === 'pregnancy' && <ProfileBanner />}
+          {!profile?.lastPeriodDate && stage === 'preconception' && <ProfileBanner />}
+          {!profile?.deliveryDate && stage === 'postpartum' && <ProfileBanner />}
+
+          {/* Header */}
           <div className="insights-header">
             <h1>Tracking Insights</h1>
             <p>Everything you need to know about where you are in your journey</p>
           </div>
 
-          {/* ── Hero card ── */}
+          {/* Hero card */}
           <div className="insights-hero card">
 
             {stage === 'pregnancy' && (
               <>
                 <div className="insights-hero-left">
-                  <span className="insights-week-badge">Week {weeksPregnant}</span>
-                  <h2>{milestone?.trimester}</h2>
-                  <p>Due date: {new Date(profile?.dueDate || mockUser.dueDate).toLocaleDateString('en-GB', {
-                    day: 'numeric', month: 'long', year: 'numeric'
-                  })}</p>
+                  <span className="insights-week-badge">
+                    {weeksPregnant ? `Week ${weeksPregnant}` : 'Week —'}
+                  </span>
+                  <h2>{milestone?.trimester || 'Complete your profile'}</h2>
+                  <p>
+                    {profile?.dueDate
+                      ? `Due date: ${new Date(profile.dueDate).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })}`
+                      : 'Add your due date in your profile'
+                    }
+                  </p>
                 </div>
                 <div className="insights-hero-right">
                   <div className="insights-baby-size">
-                    <span className="insights-baby-emoji">{baby.emoji}</span>
+                    <span className="insights-baby-emoji">{baby?.emoji || '👶'}</span>
                     <div>
                       <p className="insights-baby-label">Baby is the size of a</p>
-                      <h3>{baby.fruit}</h3>
-                      <p className="insights-baby-size-text">~{baby.size} long</p>
+                      <h3>{baby?.fruit || '—'}</h3>
+                      <p className="insights-baby-size-text">
+                        {baby ? `~${baby.size} long` : 'Complete profile to see'}
+                      </p>
                     </div>
                   </div>
                 </div>
@@ -153,12 +155,16 @@ export default function InsightsPage() {
             {stage === 'preconception' && (
               <>
                 <div className="insights-hero-left">
-                  <span className="insights-week-badge">Day {fertile.cycleDay}</span>
+                  <span className="insights-week-badge">
+                    {fertile ? `Day ${fertile.cycleDay}` : 'Day —'}
+                  </span>
                   <h2>Your Preconception Journey</h2>
                   <p>
-                    {fertile.isInFertileWindow
-                      ? '🌟 You are in your fertile window!'
-                      : `Fertile window in ${fertile.daysUntilFertile} day${fertile.daysUntilFertile !== 1 ? 's' : ''}`
+                    {fertile
+                      ? fertile.isInFertileWindow
+                        ? '🌟 You are in your fertile window!'
+                        : `Fertile window in ${fertile.daysUntilFertile} day${fertile.daysUntilFertile !== 1 ? 's' : ''}`
+                      : 'Complete your profile to see cycle info'
                     }
                   </p>
                 </div>
@@ -167,8 +173,10 @@ export default function InsightsPage() {
                     <span className="insights-baby-emoji">🌸</span>
                     <div>
                       <p className="insights-baby-label">Next period in</p>
-                      <h3>{fertile.nextPeriodIn} days</h3>
-                      <p className="insights-baby-size-text">Cycle day {fertile.cycleDay}</p>
+                      <h3>{fertile ? `${fertile.nextPeriodIn} days` : '—'}</h3>
+                      <p className="insights-baby-size-text">
+                        {fertile ? `Cycle day ${fertile.cycleDay}` : 'Complete profile'}
+                      </p>
                     </div>
                   </div>
                 </div>
@@ -178,17 +186,26 @@ export default function InsightsPage() {
             {stage === 'postpartum' && (
               <>
                 <div className="insights-hero-left">
-                  <span className="insights-week-badge">Day {babyAge.days}</span>
+                  <span className="insights-week-badge">
+                    {babyAge ? `Day ${babyAge.days}` : 'Day —'}
+                  </span>
                   <h2>Your Postpartum Journey</h2>
-                  <p>Your baby is {babyAge.label} old 💜</p>
+                  <p>
+                    {babyAge
+                      ? `Your baby is ${babyAge.label} old 💜`
+                      : 'Complete your profile to see recovery info'
+                    }
+                  </p>
                 </div>
                 <div className="insights-hero-right">
                   <div className="insights-baby-size">
                     <span className="insights-baby-emoji">🍼</span>
                     <div>
                       <p className="insights-baby-label">Your baby is</p>
-                      <h3>{babyAge.label} old</h3>
-                      <p className="insights-baby-size-text">Day {babyAge.days} postpartum</p>
+                      <h3>{babyAge ? `${babyAge.label} old` : '—'}</h3>
+                      <p className="insights-baby-size-text">
+                        {babyAge ? `Day ${babyAge.days} postpartum` : 'Complete profile'}
+                      </p>
                     </div>
                   </div>
                 </div>
@@ -197,7 +214,7 @@ export default function InsightsPage() {
 
           </div>
 
-          {/* ── Tabs ── */}
+          {/* Tabs */}
           <div className="insights-tabs">
             {tabs.map((tab, i) => (
               <button
@@ -211,7 +228,7 @@ export default function InsightsPage() {
             ))}
           </div>
 
-          {/* ── Tab content ── */}
+          {/* Tab content */}
           <div className="insights-tab-content card">
             <div className="insights-section-title">
               <span>{currentTab.icon}</span>

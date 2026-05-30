@@ -1,16 +1,15 @@
+import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import Navbar from '../components/layout/Navbar'
 import Sidebar from '../components/layout/Sidebar'
+import ProfileBanner from '../components/ui/ProfileBanner'
 import {
-  mockUser, mockPreconceptionUser, mockPostpartumUser,
   tipsOfTheDay, preconceptionTips, postpartumTips,
   trimesterInfo, getBabySize, getFertileWindow, getBabyAge
 } from '../data/mockData'
 import api from '../services/api'
-import { useState, useEffect } from 'react'
 import './DashboardPage.css'
 
-// ── Symptom lists by stage ──────────────────────────────
 const symptomsByStage = {
   pregnancy: [
     'Headache', 'Nausea/Vomiting', 'Swelling (hands/feet/face)',
@@ -29,7 +28,6 @@ const symptomsByStage = {
   ]
 }
 
-// ── Week calendar helpers ───────────────────────────────
 const getWeekDays = () => {
   const today = new Date()
   const startOfWeek = new Date(today)
@@ -45,42 +43,51 @@ const dayNames   = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
 const monthNames = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec']
 
 const riskColors = {
-  low:      { bg: '#f0fdf4', color: '#15803d', label: 'Low Risk' },
-  medium:   { bg: '#fffbeb', color: '#b45309', label: 'Medium Risk' },
-  high:     { bg: '#fff1f2', color: '#b91c1c', label: 'High Risk' },
+  low:    { bg: '#f0fdf4', color: '#15803d', label: 'Low Risk' },
+  medium: { bg: '#fffbeb', color: '#b45309', label: 'Medium Risk' },
+  high:   { bg: '#fff1f2', color: '#b91c1c', label: 'High Risk' },
 }
 
-// ── Component ───────────────────────────────────────────
 export default function DashboardPage() {
   const navigate = useNavigate()
   const today    = new Date()
   const weekDays = getWeekDays()
 
-  // ── Stage & user data ──
   const stage = localStorage.getItem('nurture_stage') || 'pregnancy'
   const name  = localStorage.getItem('nurture_name')  || 'there'
-  const [profile, setProfile] = useState(null)
+
+  const [profile,      setProfile]      = useState(null)
+  const [showBanner,   setShowBanner]   = useState(false)
+  const [showLogModal, setShowLogModal] = useState(false)
+  const [mood,         setMood]         = useState('')
+  const [symptoms,     setSymptoms]     = useState([])
+  const [notes,        setNotes]        = useState('')
+  const [periodStatus, setPeriodStatus] = useState('')
 
   useEffect(() => {
     const fetchProfile = async () => {
       try {
         const response = await api.get('/profile')
         setProfile(response.data.profile)
-        if (response.data.profile?.stage) {
-          localStorage.setItem('nurture_stage', response.data.profile.stage)
-        }
+        const profileComplete = response.data.profile?.profileComplete
+        setShowBanner(!profileComplete)
       } catch (err) {
-        console.log('Using mock data:', err)
+        console.log('Profile fetch failed:', err)
+        setShowBanner(true)
       }
     }
     fetchProfile()
   }, [])
 
-  const activeUser = stage === 'preconception'
-    ? mockPreconceptionUser
-    : stage === 'postpartum'
-    ? mockPostpartumUser
-    : mockUser
+  // Only calculate if real profile data exists
+  const milestone = stage === 'pregnancy' && profile?.weeksPregnant
+    ? trimesterInfo(profile.weeksPregnant) : null
+  const baby      = stage === 'pregnancy' && profile?.weeksPregnant
+    ? getBabySize(profile.weeksPregnant) : null
+  const fertile   = stage === 'preconception' && profile?.lastPeriodDate
+    ? getFertileWindow(profile.lastPeriodDate, profile.cycleLength) : null
+  const babyAge   = stage === 'postpartum' && profile?.deliveryDate
+    ? getBabyAge(profile.deliveryDate) : null
 
   const activeTips = stage === 'preconception'
     ? preconceptionTips
@@ -89,31 +96,12 @@ export default function DashboardPage() {
     : tipsOfTheDay
 
   const tip  = activeTips[today.getDay() % activeTips.length]
-  const risk = riskColors[activeUser.riskLevel]
-  const profileComplete = localStorage.getItem('nurture_profile_complete')
-
-  // Stage specific data
-  const milestone = stage === 'pregnancy'      ? trimesterInfo(mockUser.weeksPregnant)                                                : null
-  const baby      = stage === 'pregnancy'      ? getBabySize(mockUser.weeksPregnant)                                                  : null
-  const fertile   = stage === 'preconception'  ? getFertileWindow(mockPreconceptionUser.lastPeriodDate, mockPreconceptionUser.cycleLength) : null
-  const babyAge   = stage === 'postpartum'     ? getBabyAge(mockPostpartumUser.deliveryDate)                                          : null
-
-  // ── State ──
-  const [showBanner,   setShowBanner]   = useState(profileComplete !== 'true')
-  const [showLogModal, setShowLogModal] = useState(false)
-  const [mood,         setMood]         = useState('')
-  const [symptoms,     setSymptoms]     = useState([])
-  const [notes,        setNotes]        = useState('')
-  const [periodStatus, setPeriodStatus] = useState('')
+  const risk = riskColors[profile?.riskLevel] || riskColors['low']
 
   const availableSymptoms = symptomsByStage[stage]
 
-  // ── Handlers ──
   const toggleSymptom = (symptom) => {
-    if (symptom === 'None') {
-      setSymptoms(['None'])
-      return
-    }
+    if (symptom === 'None') { setSymptoms(['None']); return }
     setSymptoms(prev => {
       const without = prev.filter(s => s !== 'None')
       return without.includes(symptom)
@@ -143,7 +131,6 @@ export default function DashboardPage() {
     setPeriodStatus('')
   }
 
-  // ── Render ──
   return (
     <div className="dashboard-layout">
       <Navbar />
@@ -151,7 +138,7 @@ export default function DashboardPage() {
 
       <main className="dashboard-main">
 
-        {/* ── Profile incomplete banner ── */}
+        {/* Profile incomplete banner */}
         {showBanner && (
           <div className="dashboard-banner">
             <span>
@@ -172,23 +159,23 @@ export default function DashboardPage() {
 
         <div className="dashboard-content">
 
-          {/* ── Mini week calendar ── */}
-          <div className="dashboard-calendar card" onClick={() => navigate('/calendar')} style={{ cursor: 'pointer' }}>
+          {/* Mini week calendar */}
+          <div
+            className="dashboard-calendar card"
+            onClick={() => navigate('/calendar')}
+            style={{ cursor: 'pointer' }}
+          >
             <div className="dashboard-calendar-header">
               <span className="dashboard-calendar-month">
                 {monthNames[today.getMonth()]} {today.getFullYear()}
               </span>
-              <span className="dashboard-calendar-week">This Week</span>
-              <span className="dashboard-calendar-link">View full calendar →</span>                       
+              <span className="dashboard-calendar-link">View full calendar →</span>
             </div>
             <div className="dashboard-calendar-days">
               {weekDays.map((date, i) => {
                 const isToday = date.toDateString() === today.toDateString()
                 return (
-                  <div
-                    key={i}
-                    className={`dashboard-cal-day ${isToday ? 'today' : ''}`}
-                  >
+                  <div key={i} className={`dashboard-cal-day ${isToday ? 'today' : ''}`}>
                     <span className="dashboard-cal-name">{dayNames[i]}</span>
                     <span className="dashboard-cal-num">{date.getDate()}</span>
                   </div>
@@ -197,7 +184,7 @@ export default function DashboardPage() {
             </div>
           </div>
 
-          {/* ── Milestone section ── */}
+          {/* Milestone section */}
           <div className="dashboard-milestone">
             <div className="dashboard-milestone-text">
 
@@ -205,7 +192,12 @@ export default function DashboardPage() {
                 <>
                   <span className="dashboard-milestone-emoji">🤰</span>
                   <div>
-                    <h2>{milestone.label}</h2>
+                    <h2>
+                      {milestone
+                        ? milestone.label
+                        : 'Complete your profile to see your milestone 🌸'
+                      }
+                    </h2>
                     <p>You're doing amazing, {name}!</p>
                   </div>
                 </>
@@ -216,11 +208,13 @@ export default function DashboardPage() {
                   <span className="dashboard-milestone-emoji">🌸</span>
                   <div>
                     <h2>
-                      {fertile.isInFertileWindow
-                        ? 'You may be in your fertile window today! 🌟'
-                        : fertile.daysUntilFertile === 0
-                        ? 'Your fertile window is very soon! 🌟'
-                        : `Your fertile window is in ${fertile.daysUntilFertile} day${fertile.daysUntilFertile !== 1 ? 's' : ''}`
+                      {fertile
+                        ? fertile.isInFertileWindow
+                          ? 'You may be in your fertile window today! 🌟'
+                          : fertile.daysUntilFertile === 0
+                          ? 'Your fertile window is very soon! 🌟'
+                          : `Your fertile window is in ${fertile.daysUntilFertile} day${fertile.daysUntilFertile !== 1 ? 's' : ''}`
+                        : 'Complete your profile to see your cycle info 🌸'
                       }
                     </h2>
                     <p>Keep tracking, {name}! You're doing great 🌸</p>
@@ -232,8 +226,18 @@ export default function DashboardPage() {
                 <>
                   <span className="dashboard-milestone-emoji">👶</span>
                   <div>
-                    <h2>Day {babyAge.days} since delivery</h2>
-                    <p>Your baby is {babyAge.label} old — you're doing incredible, {name}!</p>
+                    <h2>
+                      {babyAge
+                        ? `Day ${babyAge.days} since delivery`
+                        : 'Complete your profile to see your recovery info 🌸'
+                      }
+                    </h2>
+                    <p>
+                      {babyAge
+                        ? `Your baby is ${babyAge.label} old — you're doing incredible, ${name}!`
+                        : `You're doing amazing, ${name}!`
+                      }
+                    </p>
                   </div>
                 </>
               )}
@@ -255,39 +259,54 @@ export default function DashboardPage() {
             </button>
           </div>
 
-          {/* ── Bottom 3 cards ── */}
+          {/* Bottom 3 cards */}
           <div className="dashboard-cards">
 
             {/* Card 1 — stage specific */}
             {stage === 'pregnancy' && (
               <div className="dashboard-card card">
                 <p className="dashboard-card-label">Baby This Week</p>
-                <div className="dashboard-baby-emoji">{baby.emoji}</div>
-                <h3>Size of a {baby.fruit}</h3>
-                <p className="dashboard-card-sub">
-                  About {baby.size} long · Week {mockUser.weeksPregnant}
-                </p>
+                {baby ? (
+                  <>
+                    <div className="dashboard-baby-emoji">{baby.emoji}</div>
+                    <h3>Size of a {baby.fruit}</h3>
+                    <p className="dashboard-card-sub">
+                      About {baby.size} long · Week {profile.weeksPregnant}
+                    </p>
+                  </>
+                ) : (
+                  <>
+                    <div className="dashboard-baby-emoji">👶</div>
+                    <p className="dashboard-card-sub" style={{ textAlign: 'center' }}>
+                      Complete your profile to see baby info 🌸
+                    </p>
+                  </>
+                )}
               </div>
             )}
 
             {stage === 'preconception' && (
               <div className="dashboard-card card">
                 <p className="dashboard-card-label">🌸 Fertile Window</p>
-                <div className="dashboard-baby-emoji"></div>
-                {fertile.isInFertileWindow ? (
-                  <>
-                    <h2>You're in your window!</h2>
-                    <p className="dashboard-card-sub">
-                      Day {fertile.cycleDay} of your cycle
-                    </p>
-                  </>
+                <div className="dashboard-baby-emoji">🌡️</div>
+                {fertile ? (
+                  fertile.isInFertileWindow ? (
+                    <>
+                      <h3>You're in your window!</h3>
+                      <p className="dashboard-card-sub">Day {fertile.cycleDay} of your cycle</p>
+                    </>
+                  ) : (
+                    <>
+                      <h3>In {fertile.daysUntilFertile} day{fertile.daysUntilFertile !== 1 ? 's' : ''}</h3>
+                      <p className="dashboard-card-sub">
+                        Day {fertile.cycleDay} of your cycle · Next period in {fertile.nextPeriodIn} days
+                      </p>
+                    </>
+                  )
                 ) : (
-                  <>
-                    <h3>In {fertile.daysUntilFertile} day{fertile.daysUntilFertile !== 1 ? 's' : ''}</h3>
-                    <p className="dashboard-card-sub">
-                      Day {fertile.cycleDay} of your cycle · Next period in {fertile.nextPeriodIn} days
-                    </p>
-                  </>
+                  <p className="dashboard-card-sub" style={{ textAlign: 'center' }}>
+                    Complete your profile to see fertility info 🌸
+                  </p>
                 )}
               </div>
             )}
@@ -296,18 +315,26 @@ export default function DashboardPage() {
               <div className="dashboard-card card">
                 <p className="dashboard-card-label">👶 Your Baby</p>
                 <div className="dashboard-baby-emoji">🍼</div>
-                <h3>{babyAge.label} old</h3>
-                <p className="dashboard-card-sub">Day {babyAge.days} postpartum</p>
+                {babyAge ? (
+                  <>
+                    <h3>{babyAge.label} old</h3>
+                    <p className="dashboard-card-sub">Day {babyAge.days} postpartum</p>
+                  </>
+                ) : (
+                  <p className="dashboard-card-sub" style={{ textAlign: 'center' }}>
+                    Complete your profile to see baby info 🌸
+                  </p>
+                )}
               </div>
             )}
 
-            {/* Tip of the day — same for all */}
+            {/* Tip of the day */}
             <div className="dashboard-card card">
               <p className="dashboard-card-label">💡 Tip of the Day</p>
               <p className="dashboard-tip-text">{tip}</p>
             </div>
 
-            {/* Risk level — same for all, clickable */}
+            {/* Risk level */}
             <div
               className="dashboard-card card dashboard-risk-card"
               style={{ background: risk.bg, cursor: 'pointer' }}
@@ -326,16 +353,17 @@ export default function DashboardPage() {
         </div>
       </main>
 
-      {/* ── Log symptoms modal ── */}
+      {/* Log symptoms modal */}
       {showLogModal && (
         <div className="dashboard-modal-overlay" onClick={() => setShowLogModal(false)}>
           <div className="dashboard-modal" onClick={e => e.stopPropagation()}>
 
             <h3>How are you feeling today? 🌸</h3>
-            <p>Log your mood and any symptoms</p>
+            <p style={{ color: '#bbb', fontSize: '0.85rem', marginBottom: '20px' }}>
+              Log your mood and any symptoms
+            </p>
 
-            {/* Mood */}
-            <div className="form-group" style={{ marginTop: '20px' }}>
+            <div className="form-group">
               <label>Mood</label>
               <select value={mood} onChange={e => setMood(e.target.value)}>
                 <option value="">Select your mood</option>
@@ -347,7 +375,6 @@ export default function DashboardPage() {
               </select>
             </div>
 
-            {/* Period tracking — preconception only */}
             {stage === 'preconception' && (
               <div className="form-group">
                 <label>Period Tracking</label>
@@ -366,7 +393,6 @@ export default function DashboardPage() {
               </div>
             )}
 
-            {/* Symptoms */}
             <div className="form-group">
               <label>Symptoms (select all that apply)</label>
               <div className="symptom-pills">
@@ -383,7 +409,6 @@ export default function DashboardPage() {
               </div>
             </div>
 
-            {/* Notes */}
             <div className="form-group">
               <label>Additional Notes (optional)</label>
               <textarea
