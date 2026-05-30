@@ -1,7 +1,7 @@
 import { useNavigate } from 'react-router-dom'
 import Navbar from '../components/layout/Navbar'
 import Sidebar from '../components/layout/Sidebar'
-import { riskData } from '../data/mockData'
+import { mockRiskData } from '../data/mockData'
 import { useState, useEffect } from 'react'
 import api from '../services/api'
 import './RiskPredictionPage.css'
@@ -51,7 +51,7 @@ const historyColors = {
 export default function RiskPredictionPage() {
   const navigate = useNavigate()
   const [activeTab, setActiveTab]   = useState('factors')
-  const [riskData,  setRiskData]    = useState(riskData)
+  const [riskData,  setRiskData]    = useState(mockRiskData)
   const [loading,   setLoading]     = useState(true)
 
   useEffect(() => {
