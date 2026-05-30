@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Navbar from '../components/layout/Navbar'
 import Sidebar from '../components/layout/Sidebar'
 import {
@@ -6,22 +6,26 @@ import {
   trimesterInfo, getBabySize, getFertileWindow, getBabyAge,
   getClosestWeekInsight, preconceptionInsights, postpartumInsights
 } from '../data/mockData'
-import {  useEffect } from 'react'
 import api from '../services/api'
 import './InsightsPage.css'
 
 
 export default function InsightsPage() {
   const [activeTab, setActiveTab] = useState(0)
-  const [profile,   setProfile]   = useState(null)
-
+  const [profile, setProfile] = useState(null)
+  const [loading, setLoading] = useState(true)
+  const [error,   setError]   = useState(false)
+  
   useEffect(() => {
     const fetchProfile = async () => {
       try {
         const response = await api.get('/profile')
         setProfile(response.data.profile)
       } catch (err) {
-        console.log('Using mock data:', err)
+        console.log('Failed to load profile:', err)
+        setError(true)
+      } finally {
+        setLoading(false)
       }
     }
     fetchProfile()
@@ -30,13 +34,11 @@ export default function InsightsPage() {
   
   
 
-  const stage = profile?.stage || localStorage.getItem('nurture_stage') || 'pregnancy'
-  const weeksPregnant = profile?.weeksPregnant || weeksPregnant
-  const dueDate = profile?.dueDate || dueDate
-  const lastPeriodDate = profile?.lastPeriodDate || lastPeriodDate
-  const cycleLength = profile?.cycleLength || cycleLength
-  const deliveryDate = profile?.deliveryDate || deliveryDate
-
+  const stage          = profile?.stage
+  const weeksPregnant  = profile?.weeksPregnant
+  const lastPeriodDate = profile?.lastPeriodDate
+  const cycleLength    = profile?.cycleLength
+  const deliveryDate   = profile?.deliveryDate
   // Pregnancy data
   const milestone = stage === 'pregnancy' ? trimesterInfo(weeksPregnant)             : null
   const baby      = stage === 'pregnancy' ? getBabySize(weeksPregnant)               : null
@@ -77,6 +79,38 @@ export default function InsightsPage() {
 
   const currentTab = tabs[activeTab]
 
+  if (loading) return (
+    <div className="dashboard-layout">
+      <Navbar />
+      <Sidebar />
+      <main className="dashboard-main">
+        <p style={{ color: '#ec407a', fontFamily: 'DM Sans, sans-serif', padding: '32px' }}>
+          Loading your insights... 🌸
+        </p>
+      </main>
+    </div>
+  )
+
+  if (error) return (
+    <div className="dashboard-layout">
+      <Navbar />
+      <Sidebar />
+      <main className="dashboard-main">
+        <div style={{ padding: '32px', fontFamily: 'DM Sans, sans-serif' }}>
+          <p style={{ color: '#b91c1c', marginBottom: '12px' }}>
+            ⚠️ Could not load your insights. Please check your connection and try again.
+          </p>
+          <button
+            style={{ padding: '10px 24px', background: 'linear-gradient(135deg, #ec407a, #f06292)', color: 'white', border: 'none', borderRadius: '12px', cursor: 'pointer', fontFamily: 'DM Sans, sans-serif' }}
+            onClick={() => window.location.reload()}
+          >
+            Try Again
+          </button>
+        </div>
+      </main>
+    </div>
+  )
+
   return (
     <div className="dashboard-layout">
       <Navbar />
@@ -97,9 +131,9 @@ export default function InsightsPage() {
             {stage === 'pregnancy' && (
               <>
                 <div className="insights-hero-left">
-                  <span className="insights-week-badge">Week {mockUser.weeksPregnant}</span>
-                  <h2>{milestone.trimester}</h2>
-                  <p>Due date: {new Date(mockUser.dueDate).toLocaleDateString('en-GB', {
+                  <span className="insights-week-badge">Week {weeksPregnant}</span>
+                  <h2>{milestone?.trimester}</h2>
+                  <p>Due date: {new Date(profile?.dueDate || mockUser.dueDate).toLocaleDateString('en-GB', {
                     day: 'numeric', month: 'long', year: 'numeric'
                   })}</p>
                 </div>

@@ -1,7 +1,7 @@
 import { useNavigate } from 'react-router-dom'
 import Navbar from '../components/layout/Navbar'
 import Sidebar from '../components/layout/Sidebar'
-import { mockRiskData } from '../data/mockData'
+import { riskData } from '../data/mockData'
 import { useState, useEffect } from 'react'
 import api from '../services/api'
 import './RiskPredictionPage.css'
@@ -51,7 +51,7 @@ const historyColors = {
 export default function RiskPredictionPage() {
   const navigate = useNavigate()
   const [activeTab, setActiveTab]   = useState('factors')
-  const [riskData,  setRiskData]    = useState(mockRiskData)
+  const [riskData,  setRiskData]    = useState(riskData)
   const [loading,   setLoading]     = useState(true)
 
   useEffect(() => {
@@ -93,7 +93,7 @@ export default function RiskPredictionPage() {
           {/* ── Page title ── */}
           <div className="risk-header">
             <h1>Risk Assessment</h1>
-            <p>Last assessed: {new Date(mockRiskData.lastAssessed).toLocaleDateString('en-GB', {
+            <p>Last assessed: {new Date(riskData.lastAssessed).toLocaleDateString('en-GB', {
               day: 'numeric', month: 'long', year: 'numeric'
             })}</p>
           </div>
@@ -106,7 +106,7 @@ export default function RiskPredictionPage() {
                 {risk.label}
               </span>
               <span className="risk-circle-score" style={{ color: risk.color }}>
-                Score: {mockRiskData.score}/10
+                Score: {riskData.score}/10
               </span>
             </div>
             <p className="risk-circle-message" style={{ color: risk.color }}>
@@ -158,7 +158,7 @@ export default function RiskPredictionPage() {
                 <h3>Why this risk level?</h3>
                 <p>These factors from your profile and recent logs contributed to your score:</p>
                 <ul>
-                  {mockRiskData.riskFactors.map((factor, i) => (
+                  {riskData.riskFactors.map((factor, i) => (
                     <li key={i} className="risk-list-item risk-list-item--danger">
                       <span className="risk-list-icon">⚠️</span>
                       <span>{factor}</span>
@@ -174,7 +174,7 @@ export default function RiskPredictionPage() {
                 <h3>What you should do</h3>
                 <p>Follow these recommendations to manage your risk level:</p>
                 <ul>
-                  {mockRiskData.recommendations.map((rec, i) => (
+                  {riskData.recommendations.map((rec, i) => (
                     <li key={i} className="risk-list-item risk-list-item--success">
                       <span className="risk-list-icon">✅</span>
                       <span>{rec}</span>
@@ -190,7 +190,7 @@ export default function RiskPredictionPage() {
                 <h3>Symptoms to watch out for</h3>
                 <p>Seek immediate medical attention if you experience any of these:</p>
                 <ul>
-                  {mockRiskData.warningSymptoms.map((symptom, i) => (
+                  {riskData.warningSymptoms.map((symptom, i) => (
                     <li key={i} className="risk-list-item risk-list-item--warning">
                       <span className="risk-list-icon">🔴</span>
                       <span>{symptom}</span>
@@ -206,8 +206,8 @@ export default function RiskPredictionPage() {
                 <h3>Risk Level History</h3>
                 <p>How your risk level has changed over time:</p>
                 <div className="risk-history">
-                  {mockRiskData.history.map((entry, i) => {
-                    const isLast = i === mockRiskData.history.length - 1
+                  {riskData.history.map((entry, i) => {
+                    const isLast = i === riskData.history.length - 1
                     const config = historyColors[entry.level]
                     return (
                       <div key={i} className="risk-history-item">
